@@ -43,6 +43,16 @@ Pagina Web ElTaller/
 7. `npm install` && `npm run build:css`.
 8. Publicar la carpeta `client/` (Netlify, Vercel, Apache, etc.).
 
+### Deploy en Vercel (desde este repo)
+
+El frontend vive en `client/`. El `vercel.json` de la raíz ya configura `outputDirectory: "client"`.
+
+Si al conectar el repo la home sigue en blanco/404:
+1. Project Settings → General → **Root Directory** → dejalo vacío (usa la raíz del repo), o poné `client`.
+2. Framework Preset: **Other**.
+3. Output Directory: `client` (si Root Directory está vacío).
+4. Redeploy.
+
 ### Si la tienda ya está en producción
 
 Ejecutá **solo** `server/supabase-rls-seguro.sql` en el SQL Editor. Eso:
