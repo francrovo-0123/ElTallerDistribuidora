@@ -42,14 +42,10 @@
 <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-6">
 
-    <!-- 1. LOGO Y NOMBRE -->
-    <a href="index.html" class="flex items-center gap-3 group shrink-0">
+    <!-- 1. LOGO -->
+    <a href="index.html" class="flex items-center shrink-0 group" aria-label="El Taller Distribuidora">
       <img src="eltaller.png" alt="El Taller Distribuidora"
-           class="w-11 h-11 object-contain group-hover:scale-105 transition-transform duration-300">
-      <div class="hidden sm:block leading-tight">
-        <span class="font-black text-xs tracking-wider text-gray-900 block uppercase">El Taller</span>
-        <span class="text-[9px] text-gray-500 font-bold tracking-widest block uppercase">Distribuidora</span>
-      </div>
+           class="h-16 w-16 md:h-20 md:w-20 object-contain group-hover:scale-105 transition-transform duration-300">
     </a>
 
     <!-- 2. LINKS DE CATEGORÍAS (Escritorio) -->
@@ -164,7 +160,7 @@
 
       <!-- LOGO / ENCABEZADO -->
       <div class="text-center mb-6">
-        <img src="eltaller.png" alt="El Taller" class="w-12 h-12 mx-auto mb-2 object-contain">
+        <img src="eltaller.png" alt="El Taller" class="w-16 h-16 mx-auto mb-2 object-contain">
         <h2 id="auth-titulo" class="text-sm font-black text-gray-900 uppercase tracking-widest">Iniciar Sesión</h2>
         <p id="auth-subtitulo" class="text-xs text-gray-500 font-medium mt-1">Accedé a tu cuenta en El Taller Distribuidora</p>
       </div>

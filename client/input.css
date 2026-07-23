@@ -447,10 +447,10 @@
     transform: none !important;
   }
   .et-stock-critical,
-  .et-banner-attention,
-  .animate-marquee-derecha {
+  .et-banner-attention {
     animation: none !important;
   }
+  /* Marquesina: se mantiene activa (es el anuncio de la tienda, no decoración) */
   [data-reveal],
   .et-stagger-item {
     opacity: 1 !important;
