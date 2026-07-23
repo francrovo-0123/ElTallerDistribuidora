@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Detalle del Producto - El Taller Distribuidora</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="supabase-config.js"></script>
+  <script src="security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="site-navbar"></div>
+  <script src="motion.js"></script>
+  <script src="navbar.js"></script>
+
+  <main class="flex-grow w-full max-w-6xl mx-auto px-6 py-10 md:py-12">
+    <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#3D5239] mb-8 transition">
+      <i class="fa-solid fa-arrow-left"></i> Volver a la tienda
+    </a>
+
+    <div id="detalle-producto-container" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center" data-reveal>
+      <div class="et-img-frame relative bg-gray-50 rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-gray-100">
+        <img id="prod-img" src="eltaller.png" alt="Producto" class="w-full h-full object-contain p-6">
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <button type="button" id="prod-tipo" class="et-chip is-active bg-[#3D5239]/10 text-[#3D5239] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full cursor-default">
+            Categoría
+          </button>
+          <h1 id="prod-titulo" class="text-2xl lg:text-3xl font-black text-gray-900 mt-3 uppercase tracking-wide">Cargando producto...</h1>
+        </div>
+
+        <p id="prod-precio" class="text-2xl font-black text-[#3D5239]">$0</p>
+
+        <p id="prod-stock" class="et-stock-msg text-xs font-bold text-gray-500"></p>
+        <p id="prod-stock-alerta" class="hidden et-stock-msg et-state-flash text-xs font-bold text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+          Sin stock — este producto no se puede agregar al carrito.
+        </p>
+
+        <p id="prod-descripcion" class="text-xs text-gray-500 font-medium leading-relaxed">
+          Seleccioná un producto desde el catálogo para ver sus especificaciones completas.
+        </p>
+
+        <div class="space-y-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-4">
+            <span class="text-xs font-black uppercase tracking-wider text-gray-700">Cantidad:</span>
+            <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
+              <button type="button" onclick="cambiarCantidadDetalle(-1)" class="et-press px-4 py-3 text-gray-600 hover:bg-gray-200 font-bold min-w-[44px]">-</button>
+              <span id="input-cantidad" class="et-qty-value px-4 py-2 text-xs font-black text-gray-800">1</span>
+              <button type="button" onclick="cambiarCantidadDetalle(1)" class="et-press px-4 py-3 text-gray-600 hover:bg-gray-200 font-bold min-w-[44px]">+</button>
+            </div>
+          </div>
+
+          <button id="btn-agregar-detalle" type="button" onclick="agregarAlCarritoDesdeDetalle()"
+            class="et-press w-full bg-[#3D5239] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:bg-[#2c3d29] transition shadow-md flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300">
+            <i class="fa-solid fa-cart-shopping"></i> Agregar al carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Tu Carrito</h2>
+          <button type="button" onclick="toggleCarrito()" class="text-gray-500 text-xl font-bold">&times;</button>
+        </div>
+        <div id="items-carrito" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2"></div>
+      </div>
+      <div class="border-t pt-4 mt-4">
+        <div class="space-y-1 text-sm mb-4">
+          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+          <div class="flex justify-between text-gray-600"><span>Descuento</span><span id="cart-descuento">-$0</span></div>
+          <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="cart-total">$0</span></div>
+        </div>
+        <button type="button" onclick="irAlCheckout()" class="et-press w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+  <script src="carrito-lite.js"></script>
+
+  <script>
+    const SUPABASE_URL = ELTALLER_SUPABASE.url;
+    const SUPABASE_KEY = ELTALLER_SUPABASE.anonKey;
+    const db = window.db || supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.db = db;
+
+    let productoActual = null;
+    let cantidadSeleccionada = 1;
+
+    function stockDisponible() {
+      return Number(productoActual?.stock);
+    }
+
+    function aplicarEstadoStock(sinStock, stock) {
+      const stockEl = document.getElementById('prod-stock');
+      const alerta = document.getElementById('prod-stock-alerta');
+      const btn = document.getElementById('btn-agregar-detalle');
+      const qtyWrap = document.getElementById('input-cantidad')?.parentElement;
+
+      if (Number.isFinite(stock)) {
+        stockEl.classList.add('is-out');
+        requestAnimationFrame(() => {
+          stockEl.innerText = sinStock ? 'Sin stock disponible' : ('Stock disponible: ' + stock);
+          stockEl.className = 'et-stock-msg text-xs font-bold ' + (sinStock ? 'text-red-600' : 'text-gray-500');
+          stockEl.classList.remove('is-out');
+        });
+      }
+
+      if (alerta) {
+        alerta.classList.toggle('hidden', !sinStock);
+        if (sinStock) alerta.classList.add('et-state-flash');
+      }
+
+      if (qtyWrap) {
+        qtyWrap.classList.toggle('opacity-50', sinStock);
+        qtyWrap.classList.toggle('pointer-events-none', sinStock);
+      }
+
+      if (sinStock) {
+        btn.disabled = true;
+        btn.classList.add('et-state-flash');
+        btn.innerHTML = '<i class="fa-solid fa-ban"></i> Sin stock';
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('et-state-flash');
+        btn.innerHTML = '<i class="fa-solid fa-cart-shopping"></i> Agregar al carrito';
+      }
+    }
+
+    async function cargarDetalleProducto() {
+      const params = new URLSearchParams(window.location.search);
+      const productoId = params.get('id');
+
+      if (!productoId) {
+        document.getElementById('prod-titulo').innerText = 'Producto no encontrado';
+        document.getElementById('btn-agregar-detalle').disabled = true;
+        return;
+      }
+
+      const { data, error } = await db
+        .from('productos')
+        .select('*')
+        .eq('id', productoId)
+        .single();
+
+      if (error || !data) {
+        document.getElementById('prod-titulo').innerText = 'No se pudo cargar el producto';
+        document.getElementById('btn-agregar-detalle').disabled = true;
+        return;
+      }
+
+      productoActual = data;
+      const titulo = data.titulo || data.nombre || 'Producto';
+      const precio = Number(data.precio ?? data.valor ?? 0) || 0;
+      const img = data.img || data.imagen || data.imagen_url || 'eltaller.png';
+      const tipo = data.categoria || data.tipo || 'General';
+      const stock = Number(data.stock);
+      const sinStock = Number.isFinite(stock) && stock <= 0;
+
+      document.title = titulo + ' - El Taller Distribuidora';
+      document.getElementById('prod-titulo').innerText = titulo;
+      document.getElementById('prod-precio').innerText = '$' + precio.toLocaleString('es-AR');
+
+      const imgEl = document.getElementById('prod-img');
+      imgEl.alt = titulo;
+      if (window.ElTallerMotion) {
+        window.ElTallerMotion.crossfadeImage(imgEl, img);
+      } else {
+        imgEl.src = img;
+      }
+
+      const tipoEl = document.getElementById('prod-tipo');
+      tipoEl.innerText = tipo;
+      tipoEl.classList.add('et-chip', 'is-active', 'et-state-flash');
+
+      if (data.descripcion) {
+        document.getElementById('prod-descripcion').innerText = data.descripcion;
+      } else {
+        document.getElementById('prod-descripcion').innerText =
+          'Producto de El Taller Distribuidora. Consultanos por WhatsApp si necesitás más detalles.';
+      }
+
+      aplicarEstadoStock(sinStock, stock);
+
+      if (window.ElTallerMotion) window.ElTallerMotion.initScrollReveal();
+    }
+
+    function cambiarCantidadDetalle(cambio) {
+      cantidadSeleccionada += cambio;
+      if (cantidadSeleccionada < 1) cantidadSeleccionada = 1;
+
+      const stock = stockDisponible();
+      if (Number.isFinite(stock) && stock > 0 && cantidadSeleccionada > stock) {
+        cantidadSeleccionada = stock;
+      }
+
+      const qtyEl = document.getElementById('input-cantidad');
+      qtyEl.innerText = cantidadSeleccionada;
+      if (window.ElTallerMotion) window.ElTallerMotion.bumpQty(qtyEl);
+    }
+
+    function agregarAlCarritoDesdeDetalle() {
+      if (!productoActual) return;
+
+      const stock = stockDisponible();
+      if (Number.isFinite(stock) && stock <= 0) {
+        if (window.ElTallerMotion) window.ElTallerMotion.toast('Sin stock disponible', 'error');
+        else alert('Este producto no tiene stock disponible.');
+        return;
+      }
+
+      const precio = Number(productoActual.precio ?? productoActual.valor ?? 0) || 0;
+      const item = {
+        id: productoActual.id,
+        titulo: productoActual.titulo || productoActual.nombre,
+        precio: precio,
+        valor: precio,
+        img: productoActual.img || productoActual.imagen || productoActual.imagen_url || 'eltaller.png',
+        tipo: productoActual.categoria || productoActual.tipo || 'general',
+        cantidad: cantidadSeleccionada
+      };
+
+      if (typeof agregarAlCarritoLite === 'function') {
+        agregarAlCarritoLite(item);
+      } else {
+        let carrito = [];
+        try {
+          carrito = JSON.parse(localStorage.getItem('eltaller_carrito') || localStorage.getItem('carrito_items') || '[]') || [];
+        } catch (e) {
+          carrito = [];
+        }
+
+        const itemIndex = carrito.findIndex((x) => String(x.id) === String(productoActual.id));
+        if (itemIndex > -1) {
+          carrito[itemIndex].cantidad += cantidadSeleccionada;
+        } else {
+          carrito.push(item);
+        }
+
+        const json = JSON.stringify(carrito);
+        localStorage.setItem('eltaller_carrito', json);
+        localStorage.setItem('carrito_items', json);
+        if (window.ElTallerMotion) window.ElTallerMotion.toast('¡Producto agregado!', 'success');
+        else alert('¡Producto agregado al carrito con éxito!');
+      }
+
+      if (typeof actualizarContadorCarritoLite === 'function') {
+        actualizarContadorCarritoLite();
+      }
+      if (typeof renderizarModalCarritoLite === 'function') {
+        renderizarModalCarritoLite();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarDetalleProducto);
+  </script>
+</body>
+</html>

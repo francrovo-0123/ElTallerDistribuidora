@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Acceso Admin - El Taller Distribuidora</title>
+  <link rel="stylesheet" href="output.css">
+  <script src="motion.js"></script>
+  <!-- FontAwesome para iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="supabase-config.js"></script>
+  <script src="security.js"></script>
+  <!-- SDK de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen font-sans">
+
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 mx-4">
+    
+    <!-- Encabezado con Logo -->
+    <div class="text-center mb-8">
+      <a href="index.html" class="inline-block">
+        <img src="eltaller.png" alt="El Taller Distribuidora" class="w-16 h-16 mx-auto mb-3 object-contain hover:scale-105 transition-transform">
+      </a>
+      <h1 class="text-base font-black text-gray-900 uppercase tracking-wider">Panel de Administración</h1>
+      <p class="text-xs text-gray-500 font-medium mt-1">Iniciá sesión para gestionar tu tienda</p>
+    </div>
+
+    <!-- Formulario de Acceso -->
+    <form id="form-login" onsubmit="handleLoginSupabase(event)" class="space-y-4">
+      
+      <div>
+        <label class="block text-xs font-black text-gray-700 uppercase tracking-widest mb-1.5">Correo electrónico</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+            <i class="fa-solid fa-envelope text-xs"></i>
+          </span>
+          <input type="email" id="email" required placeholder="eltalleradmin@gmail.com"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-semibold text-gray-800 focus:bg-white focus:border-[#3D5239] outline-none transition">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-black text-gray-700 uppercase tracking-widest mb-1.5">Contraseña</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+            <i class="fa-solid fa-lock text-xs"></i>
+          </span>
+          <input type="password" id="password" required placeholder="••••••••"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-xs font-semibold text-gray-800 focus:bg-white focus:border-[#3D5239] outline-none transition">
+        </div>
+      </div>
+
+      <!-- Botón de Ingreso -->
+      <button type="submit" id="btn-ingresar"
+        class="w-full bg-[#3D5239] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:bg-[#2c3d29] transition shadow-md active:scale-95 mt-2">
+        Ingresar al Panel
+      </button>
+
+    </form>
+
+    <!-- Enlace para volver a la tienda -->
+    <div class="text-center mt-6 pt-6 border-t border-gray-100">
+      <a href="index.html" class="text-xs font-bold text-gray-500 hover:text-black transition flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i> Volver a la tienda
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = ELTALLER_SUPABASE.url;
+    const SUPABASE_ANON_KEY = ELTALLER_SUPABASE.anonKey;
+    const CORREO_ADMIN_OFICIAL = ELTALLER_SUPABASE.adminEmail;
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function handleLoginSupabase(event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const btn = document.getElementById("btn-ingresar");
+
+      btn.innerText = "Verificando...";
+      btn.disabled = true;
+
+      const { data, error } = await db.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        alert("Acceso denegado: Verificá tus credenciales.");
+        btn.innerText = "Ingresar al Panel";
+        btn.disabled = false;
+        return;
+      }
+
+      const emailSesion = data?.user?.email || email;
+      if (!esEmailAdmin(emailSesion)) {
+        await db.auth.signOut();
+        alert("Esta página es solo para administración. Tu cuenta es de cliente.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      try { localStorage.removeItem("taller_admin_token"); } catch (_) {}
+      window.location.href = "admin.html";
+    }
+  </script>
+
+</body>
+</html>

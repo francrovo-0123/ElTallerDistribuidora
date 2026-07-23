@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Políticas de cambios - El Taller</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="site-navbar"></div>
+  <script src="motion.js"></script>
+  <script src="navbar.js"></script>
+
+  <main class="flex-grow w-full">
+    <section class="bg-[#1A2218] text-white">
+      <div class="max-w-3xl mx-auto px-6 py-14 md:py-20">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#9BB08F] mb-3">Información útil</p>
+        <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tight">Políticas de cambios</h1>
+        <p class="mt-4 text-sm md:text-base text-gray-300 leading-relaxed max-w-2xl">
+          Condiciones claras para cambios, devoluciones y arrepentimiento de compra.
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-3xl mx-auto px-6 py-12 md:py-16 space-y-10 text-sm text-gray-600 leading-relaxed">
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Plazo</h2>
+        <p>
+          Tenés <strong class="text-gray-900">10 días corridos</strong> desde la recepción del pedido para solicitar un cambio,
+          siempre que el producto esté sin uso, en su empaque original y con todos los accesorios.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Condiciones</h2>
+        <ul class="space-y-2">
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> El artículo no debe presentar signos de uso, golpes ni alteraciones.</li>
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> Debe conservar etiquetas, envoltorio y factura o número de pedido.</li>
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> Los productos en oferta o personalizados pueden tener condiciones especiales; consultanos antes.</li>
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> El cambio se realiza por otro producto de igual o mayor valor (abonando la diferencia si corresponde).</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Cómo solicitarlo</h2>
+        <ol class="space-y-2 list-decimal list-inside">
+          <li>Escribinos por WhatsApp o mail con tu número de pedido.</li>
+          <li>Indicá el producto a cambiar y el motivo.</li>
+          <li>Adjuntá fotos claras del estado del artículo y del embalaje.</li>
+          <li>Te confirmamos si aplica el cambio y cómo coordinar el envío o retiro.</li>
+        </ol>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Costos de envío</h2>
+        <p>
+          Si el cambio es por un error nuestro o por falla de fabricación, absorbemos el costo de reposición.
+          Si el cambio es por preferencia del comprador, el envío de ida y vuelta corre por cuenta del cliente, salvo que indiquemos lo contrario.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Botón de arrepentimiento</h2>
+        <p>
+          De acuerdo con la normativa vigente en Argentina, podés ejercer el derecho de arrepentimiento
+          dentro de los plazos legales para compras a distancia. Contactanos por los canales oficiales
+          para iniciar el trámite.
+        </p>
+        <a href="https://wa.me/5492236872975?text=Hola%2C%20quiero%20iniciar%20un%20cambio%20o%20arrepentimiento%20de%20compra."
+           target="_blank" rel="noopener noreferrer"
+           class="inline-flex mt-5 items-center gap-2 bg-[#3D5239] hover:bg-[#2f3f2c] text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-lg transition">
+          <i class="fa-brands fa-whatsapp"></i> Solicitar cambio
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Tu Carrito</h2>
+          <button onclick="toggleCarrito()" class="text-gray-500 text-xl font-bold">&times;</button>
+        </div>
+        <div id="items-carrito" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2"></div>
+      </div>
+      <div class="border-t pt-4 mt-4">
+        <div class="space-y-1 text-sm mb-4">
+          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+          <div class="flex justify-between text-gray-600"><span>Descuento</span><span id="cart-descuento">-$0</span></div>
+          <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="cart-total">$0</span></div>
+        </div>
+        <button onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+  <script src="carrito-lite.js"></script>
+</body>
+</html>

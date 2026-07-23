@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Sobre Nosotros - El Taller</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="site-navbar"></div>
+  <script src="motion.js"></script>
+  <script src="navbar.js"></script>
+
+  <main class="flex-grow w-full">
+    <section class="bg-[#1A2218] text-white">
+      <div class="max-w-3xl mx-auto px-6 py-14 md:py-20">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#9BB08F] mb-3">El Taller Distribuidora</p>
+        <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tight">Sobre Nosotros</h1>
+        <p class="mt-4 text-sm md:text-base text-gray-300 leading-relaxed max-w-2xl">
+          Somos una distribuidora mayorista de mates, bombillas y accesorios, con foco en calidad, volumen y atención cercana.
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-3xl mx-auto px-6 py-12 md:py-16 space-y-10">
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Quiénes somos</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          En <strong class="text-gray-900">El Taller Distribuidora</strong> trabajamos para que comercios, emprendedores y revendedores encuentren mates artesanales y complementos listos para vender.
+          Seleccionamos cada línea pensando en durabilidad, terminación y precio mayorista.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Qué ofrecemos</h2>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> Mates torpedos, camioneros, imperial y piezas exclusivas</li>
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> Bombillas y accesorios para completar el pedido</li>
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> Condiciones pensadas para compra mayorista y reposición</li>
+          <li class="flex gap-2"><span class="text-[#3D5239] font-bold">·</span> Asesoramiento por WhatsApp para armar tu pedido</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Dónde estamos</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          Nos encontramos ubicados en <strong class="text-gray-900">Miramar, Buenos Aires</strong>.
+          Si preferís escribirnos, estamos en WhatsApp y por mail todos los días hábiles.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="trabaja-con-nosotros.html" class="inline-flex items-center gap-2 bg-[#3D5239] hover:bg-[#2f3f2c] text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-lg transition">
+            Trabajá con nosotros
+          </a>
+          <a href="nuestros-productos.html" class="inline-flex items-center gap-2 border border-gray-300 hover:border-[#3D5239] text-gray-800 text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-lg transition">
+            Ver productos
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Tu Carrito</h2>
+          <button onclick="toggleCarrito()" class="text-gray-500 text-xl font-bold">&times;</button>
+        </div>
+        <div id="items-carrito" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2"></div>
+      </div>
+      <div class="border-t pt-4 mt-4">
+        <div class="space-y-1 text-sm mb-4">
+          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+          <div class="flex justify-between text-gray-600"><span>Descuento</span><span id="cart-descuento">-$0</span></div>
+          <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="cart-total">$0</span></div>
+        </div>
+        <button onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+  <script src="carrito-lite.js"></script>
+</body>
+</html>

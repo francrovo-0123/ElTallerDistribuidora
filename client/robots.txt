@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin.html
+Disallow: /login.html
+Disallow: /checkout.html
+Disallow: /mi-cuenta.html
+Disallow: /gracias.html
+
+Sitemap: https://eltallerdistribuidora.com/sitemap.xml

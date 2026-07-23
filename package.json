@@ -1,0 +1,13 @@
+{
+  "name": "eltaller-ecommerce",
+  "version": "1.0.0",
+  "private": true,
+  "description": "El Taller Distribuidora - E-commerce frontend",
+  "scripts": {
+    "build:css": "tailwindcss -i ./client/input.css -o ./client/output.css --minify",
+    "watch:css": "tailwindcss -i ./client/input.css -o ./client/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

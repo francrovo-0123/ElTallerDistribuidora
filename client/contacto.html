@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Contacto - El Taller</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="site-navbar"></div>
+  <script src="supabase-config.js"></script>
+  <script src="security.js"></script>
+  <script src="motion.js"></script>
+  <script src="navbar.js"></script>
+
+  <main class="flex-grow w-full">
+    <section class="bg-[#1A2218] text-white">
+      <div class="max-w-5xl mx-auto px-6 py-14 md:py-20">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#9BB08F] mb-3">Estamos para ayudarte</p>
+        <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tight">Contacto</h1>
+        <p class="mt-4 text-sm md:text-base text-gray-300 leading-relaxed max-w-2xl">
+          Escribinos por WhatsApp, mail o acercate al local en Miramar, Buenos Aires.
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-5xl mx-auto px-6 py-12 md:py-16">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+        <div class="space-y-8">
+          <div>
+            <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Datos</h2>
+            <ul class="space-y-4 text-sm text-gray-600">
+              <li class="flex items-start gap-3">
+                <i class="fa-brands fa-whatsapp text-emerald-500 mt-0.5"></i>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">WhatsApp</p>
+                  <a href="https://wa.me/5492236872975" target="_blank" rel="noopener noreferrer" class="font-semibold text-gray-900 hover:text-[#3D5239] transition">54 9 2236872975</a>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <i class="fa-solid fa-phone text-gray-400 mt-0.5"></i>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Teléfono</p>
+                  <p class="font-semibold text-gray-900">(223) 687 - 2975</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <i class="fa-solid fa-envelope text-gray-400 mt-0.5"></i>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Email</p>
+                  <a href="mailto:eltallerdistribuidora@gmail.com" class="font-semibold text-gray-900 hover:text-[#3D5239] transition">eltallerdistribuidora@gmail.com</a>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <i class="fa-solid fa-location-dot text-gray-400 mt-0.5"></i>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Dirección</p>
+                  <p class="font-semibold text-gray-900">Nos encontramos ubicados en Miramar, Buenos Aires.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <a href="https://wa.me/5492236872975?text=Hola%2C%20quiero%20hacer%20una%20consulta%20sobre%20El%20Taller."
+             target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe57] text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-lg transition">
+            <i class="fa-brands fa-whatsapp text-sm"></i> Escribir por WhatsApp
+          </a>
+        </div>
+
+        <div>
+          <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Dejanos un mensaje</h2>
+          <form id="form-contacto" class="space-y-4" novalidate>
+            <div>
+              <label for="nombre" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Nombre</label>
+              <input id="nombre" name="nombre" type="text" required
+                class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+                placeholder="Tu nombre">
+            </div>
+            <div>
+              <label for="telefono" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Teléfono / WhatsApp</label>
+              <input id="telefono" name="telefono" type="tel" required
+                class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+                placeholder="Ej: 223 687-2975">
+            </div>
+            <div>
+              <label for="email" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Email</label>
+              <input id="email" name="email" type="email" required
+                class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+                placeholder="tunombre@email.com">
+            </div>
+            <div>
+              <label for="mensaje" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Mensaje</label>
+              <textarea id="mensaje" name="mensaje" rows="5" required
+                class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition resize-y"
+                placeholder="Contanos en qué podemos ayudarte"></textarea>
+            </div>
+            <button type="submit"
+              class="w-full sm:w-auto bg-[#3D5239] hover:bg-[#2f3f2c] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-lg transition inline-flex items-center justify-center gap-2">
+              <i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp
+            </button>
+            <p id="msg-contacto" class="text-xs text-gray-500 hidden"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Tu Carrito</h2>
+          <button onclick="toggleCarrito()" class="text-gray-500 text-xl font-bold">&times;</button>
+        </div>
+        <div id="items-carrito" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2"></div>
+      </div>
+      <div class="border-t pt-4 mt-4">
+        <div class="space-y-1 text-sm mb-4">
+          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+          <div class="flex justify-between text-gray-600"><span>Descuento</span><span id="cart-descuento">-$0</span></div>
+          <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="cart-total">$0</span></div>
+        </div>
+        <button onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+  <script src="carrito-lite.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = ELTALLER_SUPABASE.url;
+    const SUPABASE_KEY = ELTALLER_SUPABASE.anonKey;
+    const WHATSAPP_NEGOCIO = '5492236872975';
+    const db = window.db || supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.db = db;
+
+    document.getElementById('form-contacto')?.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const trunc = (v, n) => (window.ElTallerSecurity ? window.ElTallerSecurity.truncate(v, n) : String(v || '').slice(0, n));
+      const nombre = trunc(document.getElementById('nombre').value.trim(), 120);
+      const telefono = trunc(document.getElementById('telefono').value.trim(), 40);
+      const email = trunc(document.getElementById('email').value.trim(), 254);
+      const mensaje = trunc(document.getElementById('mensaje').value.trim(), 4000);
+      const msg = document.getElementById('msg-contacto');
+      const btn = e.target.querySelector('button[type="submit"]');
+
+      if (!nombre || !telefono || !email || !mensaje) {
+        msg.textContent = 'Completá todos los campos.';
+        msg.className = 'text-xs text-red-600';
+        msg.classList.remove('hidden');
+        return;
+      }
+
+      if (window.ElTallerSecurity && !window.ElTallerSecurity.isValidEmail(email)) {
+        msg.textContent = 'Ingresá un email válido.';
+        msg.className = 'text-xs text-red-600';
+        msg.classList.remove('hidden');
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = 'Enviando...';
+      }
+
+      const { error } = await db.from('mensajes_contacto').insert([{
+        nombre,
+        telefono,
+        email,
+        mensaje
+      }]);
+
+      if (error) {
+        console.error(error);
+      }
+
+      const limpio = (v) => String(v || '').replace(/[*_`]/g, '');
+      const textoWpp =
+`Hola! Consulta desde la web
+
+• Nombre: ${limpio(nombre)}
+• Teléfono: ${limpio(telefono)}
+• Email: ${limpio(email)}
+
+Mensaje:
+${limpio(mensaje)}`;
+
+      window.open(
+        `https://wa.me/${WHATSAPP_NEGOCIO}?text=${encodeURIComponent(textoWpp)}`,
+        '_blank',
+        'noopener,noreferrer'
+      );
+
+      e.target.reset();
+      msg.textContent = error
+        ? 'Se abrió WhatsApp. (El mensaje no se guardó en el panel; ejecutá el SQL de contacto si falta la columna teléfono.)'
+        : '¡Listo! Se abrió WhatsApp con tu consulta. Te respondemos por ahí.';
+      msg.className = 'text-xs text-[#3D5239]';
+      msg.classList.remove('hidden');
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp';
+      }
+    });
+  </script>
+</body>
+</html>

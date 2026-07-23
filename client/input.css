@@ -1,0 +1,467 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Spacing system — 4pt / 0.25rem grid (Tailwind default scale)
+  Prefer even steps for layout: 1, 2, 3, 4, 6, 8, 10, 12
+  Half-steps (0.5, 1.5, 2.5) only for dense chrome: badges, icon pads, compact controls
+  Avoid layout use of 3.5 / 5 unless intentional optical tweak
+
+  Containers (shop): max-w-7xl + px-6 (aligned with navbar/footer)
+  Section stack: mb-8 | mb-12
+  Cards: p-4 | gap-4
+  Forms: space-y-4, label mb-1.5, input py-2.5 px-4
+  Tables: py-3 px-4
+  Touch targets: min ~44px (w-11 h-11 / py-3 with adequate width)
+*/
+
+@layer base {
+  :root {
+    --space-1: 0.25rem;  /* 4px */
+    --space-2: 0.5rem;   /* 8px */
+    --space-3: 0.75rem;  /* 12px */
+    --space-4: 1rem;     /* 16px */
+    --space-6: 1.5rem;   /* 24px */
+    --space-8: 2rem;     /* 32px */
+    --space-10: 2.5rem;  /* 40px */
+    --space-12: 3rem;    /* 48px */
+
+    /* Motion tokens — compositor-only (transform / opacity) */
+    --et-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --et-dur-fast: 180ms;
+    --et-dur: 280ms;
+    --et-dur-slow: 420ms;
+  }
+}
+
+@layer components {
+  /* Page enter: subtle opacity only — no layout shift */
+  html.et-page-enter body {
+    opacity: 0;
+  }
+  html.et-page-enter.et-ready body {
+    opacity: 1;
+    transition: opacity var(--et-dur) var(--et-ease);
+  }
+
+  /* Product card hover — scale image + lift via transform */
+  .et-card {
+    transition:
+      transform var(--et-dur) var(--et-ease),
+      box-shadow var(--et-dur) var(--et-ease);
+    will-change: auto;
+  }
+  .et-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(30, 39, 28, 0.1);
+  }
+  .et-card img {
+    transition: transform 500ms var(--et-ease);
+  }
+  .et-card:hover img {
+    transform: scale(1.04);
+  }
+
+  /* Cart drawer — overlay opacity + panel translateX */
+  .et-drawer {
+    opacity: 0;
+    transition: opacity var(--et-dur) var(--et-ease);
+  }
+  .et-drawer.is-open {
+    opacity: 1;
+  }
+  .et-drawer-panel {
+    transform: translateX(100%);
+    transition: transform var(--et-dur-slow) var(--et-ease);
+  }
+  .et-drawer.is-open .et-drawer-panel {
+    transform: translateX(0);
+  }
+
+  /* Auth / admin modal panel */
+  .et-modal-panel {
+    transition:
+      transform var(--et-dur) var(--et-ease),
+      opacity var(--et-dur) var(--et-ease);
+  }
+
+  /* Scroll reveal */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.5s var(--et-ease),
+      transform 0.5s var(--et-ease);
+  }
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Staggered grid entry */
+  .et-stagger-item {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.4s var(--et-ease),
+      transform 0.4s var(--et-ease);
+    transition-delay: calc(var(--et-stagger, 0) * 40ms);
+  }
+  .is-staggered .et-stagger-item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Cart badge pop */
+  .et-badge-pop {
+    animation: et-badge-pop 0.35s var(--et-ease);
+  }
+
+  /* Low-stock gentle pulse (opacity only) */
+  .et-stock-critical {
+    animation: et-soft-pulse 2.8s ease-in-out infinite;
+  }
+
+  /* Alert banner attention (slow opacity breathe) */
+  .et-banner-attention {
+    animation: et-banner-glow 4s ease-in-out infinite;
+  }
+
+  /* Order / metric state change */
+  .et-state-flash {
+    animation: et-state-flash 0.35s var(--et-ease);
+  }
+
+  /* Toast feedback */
+  .et-toast-host {
+    position: fixed;
+    bottom: 5.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+    width: min(92vw, 22rem);
+  }
+  .et-toast {
+    background: #1E271C;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--et-dur) var(--et-ease),
+      transform var(--et-dur) var(--et-ease);
+  }
+  .et-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .et-toast--success { background: #3D5239; }
+  .et-toast--error { background: #8B2E2E; }
+
+  /* Admin section crossfade */
+  .et-section-enter {
+    animation: et-fade-up 0.35s var(--et-ease) both;
+  }
+
+  /* Order row entry */
+  .et-row-enter {
+    animation: et-fade-up 0.3s var(--et-ease) both;
+  }
+
+  /* Marquee (moved from index inline for reuse) */
+  .animate-marquee-derecha {
+    display: flex;
+    width: 200%;
+    animation: marquee-derecha 25s linear infinite;
+  }
+  .marquee-half {
+    display: flex;
+    width: 50%;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-around;
+    gap: 3rem;
+  }
+  .marquee-half span {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Banner carousel */
+  .banner-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #1E271C;
+  }
+  .banner-track {
+    display: flex;
+    transition: transform 0.55s var(--et-ease);
+  }
+  .banner-track.sin-animacion {
+    transition: none;
+  }
+  .banner-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+  }
+  .banner-slide img {
+    display: block;
+    width: 100%;
+    height: clamp(180px, 38vw, 420px);
+    object-fit: cover;
+    object-position: center;
+  }
+  .banner-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #1E271C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s, transform 0.2s var(--et-ease);
+  }
+  .banner-btn:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.05);
+  }
+  .banner-btn.prev { left: 0.75rem; }
+  .banner-btn.next { right: 0.75rem; }
+  .banner-dots {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    gap: 0.375rem;
+  }
+  .banner-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.45);
+    transition: background 0.2s, width 0.2s var(--et-ease);
+  }
+  .banner-dot.activo {
+    background: #fff;
+    width: 1.25rem;
+  }
+
+  /* Product carousels */
+  .carrusel-track {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.25rem 0.25rem 0.75rem;
+    scrollbar-width: none;
+  }
+  .carrusel-track::-webkit-scrollbar { display: none; }
+  .carrusel-card {
+    flex: 0 0 min(72vw, 220px);
+    scroll-snap-align: start;
+  }
+  @media (min-width: 640px) {
+    .carrusel-card { flex-basis: 200px; }
+  }
+  @media (min-width: 1024px) {
+    .carrusel-card { flex-basis: 220px; }
+  }
+
+  /* Button press micro-feedback */
+  .et-press:active {
+    transform: scale(0.97);
+  }
+  .et-press {
+    transition: transform var(--et-dur-fast) var(--et-ease), background-color var(--et-dur-fast) ease;
+  }
+
+  /* WA / email / admin action chips */
+  .et-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition:
+      transform var(--et-dur-fast) var(--et-ease),
+      opacity var(--et-dur-fast) var(--et-ease),
+      background-color var(--et-dur-fast) ease;
+  }
+  .et-action-btn:hover {
+    transform: scale(1.04);
+  }
+  .et-action-btn:active {
+    transform: scale(0.96);
+  }
+  .et-action-btn.is-clicked {
+    animation: et-badge-pop 0.32s var(--et-ease);
+  }
+
+  /* PDP image crossfade / zoom */
+  .et-img-frame {
+    position: relative;
+    overflow: hidden;
+  }
+  .et-img-frame img {
+    transition:
+      opacity var(--et-dur-slow) var(--et-ease),
+      transform 0.55s var(--et-ease);
+  }
+  .et-img-frame img.is-fading {
+    opacity: 0;
+  }
+  .et-img-frame:hover img:not(.is-fading) {
+    transform: scale(1.03);
+  }
+
+  /* Quantity / chip selectors */
+  .et-qty-value {
+    display: inline-block;
+    transition: transform var(--et-dur-fast) var(--et-ease), opacity var(--et-dur-fast) var(--et-ease);
+  }
+  .et-qty-value.is-bump {
+    animation: et-badge-pop 0.3s var(--et-ease);
+  }
+  .et-chip {
+    transition:
+      transform var(--et-dur-fast) var(--et-ease),
+      background-color var(--et-dur) ease,
+      color var(--et-dur) ease,
+      box-shadow var(--et-dur) var(--et-ease);
+  }
+  .et-chip.is-active {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 2px rgba(61, 82, 57, 0.25);
+  }
+
+  /* Form field polish */
+  .et-field {
+    transition:
+      border-color var(--et-dur-fast) ease,
+      box-shadow var(--et-dur-fast) var(--et-ease),
+      background-color var(--et-dur-fast) ease;
+  }
+  .et-field:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(61, 82, 57, 0.15);
+  }
+  .et-form-success {
+    animation: et-fade-up 0.4s var(--et-ease) both;
+  }
+
+  /* Ranking list FLIP row */
+  .et-rank-row {
+    transition: transform 0.4s var(--et-ease), opacity 0.35s var(--et-ease);
+  }
+  .et-rank-row img {
+    transition: transform var(--et-dur) var(--et-ease);
+  }
+  .et-rank-row:hover img {
+    transform: scale(1.08);
+  }
+
+  /* Mobile nav panel */
+  .et-nav-panel {
+    transform-origin: top center;
+    transition:
+      opacity var(--et-dur) var(--et-ease),
+      transform var(--et-dur) var(--et-ease);
+  }
+  .et-nav-panel:not(.is-open) {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.98);
+    pointer-events: none;
+  }
+  .et-nav-panel.is-open {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+
+  /* Stock message enter */
+  .et-stock-msg {
+    transition: opacity var(--et-dur) var(--et-ease), transform var(--et-dur) var(--et-ease);
+  }
+  .et-stock-msg.is-out {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.et-page-enter body,
+  html.et-page-enter.et-ready body {
+    opacity: 1;
+    transition: none;
+  }
+  .et-card,
+  .et-card img,
+  .et-drawer,
+  .et-drawer-panel,
+  .et-modal-panel,
+  [data-reveal],
+  .et-stagger-item,
+  .et-toast,
+  .banner-track,
+  .banner-btn,
+  .banner-dot,
+  .et-press,
+  .et-action-btn,
+  .et-img-frame img,
+  .et-qty-value,
+  .et-chip,
+  .et-field,
+  .et-rank-row,
+  .et-rank-row img,
+  .et-nav-panel,
+  .et-stock-msg {
+    transition: none !important;
+    animation: none !important;
+  }
+  .et-card:hover,
+  .et-card:hover img,
+  [data-reveal],
+  .et-stagger-item,
+  .et-drawer-panel,
+  .et-action-btn:hover,
+  .et-img-frame:hover img,
+  .et-rank-row:hover img {
+    transform: none !important;
+  }
+  .et-stock-critical,
+  .et-banner-attention,
+  .animate-marquee-derecha {
+    animation: none !important;
+  }
+  [data-reveal],
+  .et-stagger-item {
+    opacity: 1 !important;
+  }
+  .et-nav-panel:not(.is-open) {
+    /* keep closed panels closed even with reduced motion */
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .et-nav-panel.hidden {
+    display: none !important;
+  }
+}
+

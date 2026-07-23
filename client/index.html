@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora — mates, termos y accesorios mayorista y minorista desde Miramar, Buenos Aires.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>El Taller - Tienda Online</title>
+  <link rel="stylesheet" href="output.css">
+  <!-- FontAwesome para los íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase JS -->
+  <script src="supabase-config.js"></script>
+  <script src="security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="motion.js"></script>
+</head>
+<body class="bg-taller-light font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- MARQUESINA INFINITA (DE IZQUIERDA A DERECHA) -->
+  <div id="container-marquee" class="bg-[#4A5D3F] text-white overflow-hidden py-2 text-xs font-semibold tracking-wider uppercase border-t border-b border-[#3C4C33] et-banner-attention">
+    <div id="marquee-content" class="animate-marquee-derecha whitespace-nowrap flex">
+      <!-- Se llena automáticamente con el texto repetido por JavaScript -->
+    </div>
+  </div>
+
+  <div id="site-navbar"></div>
+  <script src="navbar.js"></script>
+
+  <!-- CARRUSEL DE BANNERS -->
+  <section class="banner-carousel" id="banner-carousel" aria-label="Promociones">
+    <div class="banner-track" id="banner-track">
+      <!-- Se completa con JavaScript -->
+    </div>
+    <button type="button" class="banner-btn prev" onclick="moverBanner(-1)" aria-label="Banner anterior">
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+    </button>
+    <button type="button" class="banner-btn next" onclick="moverBanner(1)" aria-label="Banner siguiente">
+      <i class="fa-solid fa-chevron-right text-xs"></i>
+    </button>
+    <div class="banner-dots" id="banner-dots"></div>
+  </section>
+
+  <!-- CATÁLOGO DE PRODUCTOS -->
+  <main class="max-w-7xl mx-auto px-6 pt-6 pb-24 md:pt-8 md:pb-8 flex-grow w-full">
+
+    <!-- CARRUSEL DESTACADOS -->
+    <section id="seccion-destacados" class="mb-10 md:mb-12 hidden" data-reveal>
+      <div class="flex items-center justify-between gap-4 mb-4">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-taller mb-1 leading-none">Selección</p>
+          <h2 class="text-xl font-bold text-gray-800 leading-tight">Destacados</h2>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <button type="button" onclick="moverCarrusel('track-destacados', -1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-taller hover:text-white hover:border-taller transition flex items-center justify-center" aria-label="Anterior destacados">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <button type="button" onclick="moverCarrusel('track-destacados', 1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-taller hover:text-white hover:border-taller transition flex items-center justify-center" aria-label="Siguiente destacados">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+      <div id="track-destacados" class="carrusel-track">
+        <!-- Dinámico -->
+      </div>
+    </section>
+
+    <!-- CARRUSEL OFERTAS -->
+    <section id="seccion-ofertas" class="mb-10 md:mb-12 hidden" data-reveal>
+      <div class="flex items-center justify-between gap-4 mb-4">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-[#C4A484] mb-1 leading-none">Promo</p>
+          <h2 class="text-xl font-bold text-gray-800 leading-tight">En Oferta</h2>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <button type="button" onclick="moverCarrusel('track-ofertas', -1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-[#C4A484] hover:text-white hover:border-[#C4A484] transition flex items-center justify-center" aria-label="Anterior ofertas">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <button type="button" onclick="moverCarrusel('track-ofertas', 1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-[#C4A484] hover:text-white hover:border-[#C4A484] transition flex items-center justify-center" aria-label="Siguiente ofertas">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+      <div id="track-ofertas" class="carrusel-track">
+        <!-- Dinámico -->
+      </div>
+    </section>
+
+    <h2 class="text-xl font-bold mb-6 text-gray-800" data-reveal>Catálogo de Productos</h2>
+    
+    <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" data-reveal>
+      <p class="text-gray-500 col-span-full text-center py-12">Cargando catálogo...</p>
+    </div>
+  </main>
+
+  <!-- MODAL DEL CARRITO DE COMPRAS -->
+  <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Tu Carrito</h2>
+          <button onclick="toggleCarrito()" class="text-gray-500 text-xl font-bold">&times;</button>
+        </div>
+
+        <div id="items-carrito" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
+          <!-- Dinámico -->
+        </div>
+      </div>
+
+      <div class="border-t pt-4 mt-4">
+        <!-- CAMPO APLICAR CUPÓN -->
+        <div class="my-4 p-3 bg-gray-50 border rounded-xl">
+          <label class="block text-xs font-semibold text-gray-600 mb-1">¿Tenés un cupón de descuento?</label>
+          <div class="flex gap-2">
+            <input type="text" id="input-cupon" placeholder="Ej: VERANO2026" class="w-full border rounded-lg px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:ring-2 focus:ring-taller">
+            <button type="button" onclick="validarYAplicarCupon()" class="bg-taller hover:bg-taller-dark text-white font-bold text-xs px-3 py-2 rounded-lg transition whitespace-nowrap">
+              Aplicar
+            </button>
+          </div>
+          <!-- Mensaje de confirmación o error -->
+          <p id="msg-cupon" class="text-[11px] mt-1 hidden"></p>
+        </div>
+
+        <div class="space-y-1 mb-4">
+          <div class="flex justify-between text-sm text-gray-600">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal">$0</span>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <span>Descuento:</span>
+            <span id="cart-descuento">-$0</span>
+          </div>
+          <div class="flex justify-between text-lg font-bold">
+            <span>Total:</span>
+            <span id="cart-total">$0</span>
+          </div>
+        </div>
+
+        <button type="button" id="btn-comprar" onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg shadow transition flex items-center justify-center gap-2 mt-4">
+          Ir al Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+
+  <script>
+    // Configuración de Supabase (reutiliza el cliente de la navbar si ya existe)
+    const SUPABASE_URL = ELTALLER_SUPABASE.url;
+    const SUPABASE_KEY = ELTALLER_SUPABASE.anonKey;
+    const db = window.db || supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.db = db;
+
+    let productos = [];
+    let productosBase = [];
+    let productosLookup = {}; // id -> producto (catálogo + carruseles)
+    let carrito = [];
+    let cuponAplicado = null; // Guardará el cupón activo en el carrito
+    // Variable global para controlar qué categoría está filtrada
+    let categoriaSeleccionada = 'todas';
+    // Filtro especial: productos marcados como exclusivos en el admin
+    let filtroExclusivos = false;
+    // Número de WhatsApp del negocio (código de país, sin + ni espacios)
+    const WHATSAPP_NEGOCIO = '5492236872975';
+
+    function registrarProductosEnLookup(lista) {
+      (lista || []).forEach(p => {
+        if (p && p.id != null) productosLookup[p.id] = p;
+      });
+    }
+
+    // Cargar catálogo desde Supabase
+    async function cargarProductos() {
+      let query = db.from('productos').select('*');
+
+      if (filtroExclusivos) {
+        query = query.eq('exclusivo', true);
+      } else if (typeof categoriaSeleccionada !== 'undefined' && categoriaSeleccionada !== 'todas') {
+        query = query.eq('categoria', categoriaSeleccionada);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error al cargar productos:', error);
+        document.getElementById('grid-productos').innerHTML = `<p class="text-red-500 col-span-full text-center py-12">Error al cargar productos. Por favor intentá de nuevo.</p>`;
+        return;
+      }
+
+      productos = data;
+      productosBase = data || [];
+      registrarProductosEnLookup(productos);
+      renderizarProductos();
+    }
+
+    // Carruseles de Home: Destacados y Ofertas
+    async function cargarCarruselesPortada() {
+      const { data, error } = await db
+        .from('productos')
+        .select('*')
+        .or('es_destacado.eq.true,en_oferta.eq.true')
+        .order('titulo', { ascending: true });
+
+      if (error) {
+        console.error('Error al cargar carruseles de portada:', error);
+        return;
+      }
+
+      const lista = data || [];
+      registrarProductosEnLookup(lista);
+
+      const destacados = lista.filter(p => p.es_destacado);
+      const ofertas = lista.filter(p => p.en_oferta);
+
+      renderizarCarrusel('seccion-destacados', 'track-destacados', destacados, 'destacado');
+      renderizarCarrusel('seccion-ofertas', 'track-ofertas', ofertas, 'oferta');
+    }
+
+    function renderizarCarrusel(seccionId, trackId, lista, tipo) {
+      const seccion = document.getElementById(seccionId);
+      const track = document.getElementById(trackId);
+      if (!seccion || !track) return;
+
+      if (!lista || lista.length === 0) {
+        seccion.classList.add('hidden');
+        track.innerHTML = '';
+        return;
+      }
+
+      seccion.classList.remove('hidden');
+      track.innerHTML = lista.map(p => tarjetaCarrusel(p, tipo)).join('');
+      if (window.ElTallerMotion) window.ElTallerMotion.initScrollReveal();
+    }
+
+    function tarjetaCarrusel(p, tipo) {
+      const badge = tipo === 'oferta'
+        ? '<span class="absolute top-3 left-3 bg-[#C4A484] text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Oferta</span>'
+        : '<span class="absolute top-3 left-3 bg-taller text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Destacado</span>';
+
+      return `
+        <article class="carrusel-card et-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+          <a href="producto.html?id=${p.id}" class="relative block overflow-hidden">
+            <img src="${p.img || 'https://via.placeholder.com/300'}" alt="${p.titulo}" class="w-full h-40 object-cover">
+            ${badge}
+          </a>
+          <div class="p-4 flex flex-col flex-grow justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-gray-800 text-sm leading-snug line-clamp-2">
+                <a href="producto.html?id=${p.id}" class="hover:text-taller-dark transition">${p.titulo}</a>
+              </h3>
+              <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">${p.categoria || ''}</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-base font-bold text-taller-dark">$${Number(p.precio).toLocaleString('es-AR')}</span>
+                <span class="${p.stock > 0
+                  ? 'bg-taller-light text-taller-dark border border-taller-accent/30'
+                  : 'bg-red-50 text-red-700 border border-red-200'} text-[10px] font-bold px-2 py-0.5 rounded">
+                  ${p.stock > 0 ? `Stock: ${p.stock}` : 'Agotado'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onclick="agregarAlCarrito(${p.id})"
+                ${p.stock <= 0 ? 'disabled' : ''}
+                class="et-press w-full min-h-[44px] bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg text-[11px] flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-taller disabled:hover:bg-gray-300">
+                <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar' : 'Sin Stock'}
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function moverCarrusel(trackId, direccion) {
+      const track = document.getElementById(trackId);
+      if (!track) return;
+      const card = track.querySelector('.carrusel-card');
+      const paso = card ? card.offsetWidth + 16 : 220;
+      track.scrollBy({ left: direccion * paso, behavior: 'smooth' });
+    }
+
+    const CAT_LINK_BASE = 'cat-link hover:text-black transition py-1 px-2';
+    const CAT_LINK_ACTIVO = 'cat-link border-2 border-black rounded px-3 py-1 text-black font-extrabold shadow-sm';
+
+    const NAV_CATEGORIAS = [
+      { slug: 'index', href: 'index.html', label: 'INICIO' },
+      { slug: 'exclusivos', href: 'exclusivos.html', label: 'EXCLUSIVOS' },
+      { slug: 'torpedos', href: 'torpedos.html', label: 'TORPEDOS' },
+      { slug: 'camioneros', href: 'camioneros.html', label: 'CAMIONEROS' },
+      { slug: 'imperiales', href: 'imperiales.html', label: 'IMPERIALES' },
+      { slug: 'bombillas', href: 'bombillas.html', label: 'BOMBILLAS' },
+      { slug: 'accesorios', href: 'accesorios.html', label: 'ACCESORIOS' },
+      { slug: 'termos', href: 'termos.html', label: 'TERMOS' },
+      { slug: 'regalos-empresariales', href: 'regalos-empresariales.html', label: 'REGALOS EMPRESARIALES' }
+    ];
+
+    function slugifyCategoria(nombre) {
+      return (nombre || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    }
+
+    async function cargarCategoriasHeader() {
+      const menu = document.getElementById('menu-categorias');
+      if (!menu) return;
+
+      // Menú fijo con páginas HTML de categoría + activación de INICIO
+      let items = [...NAV_CATEGORIAS];
+
+      // Si hay categorías extra en Supabase, las sumamos (salvo duplicadas)
+      const { data: categorias } = await db
+        .from('categorias')
+        .select('*')
+        .order('orden', { ascending: true });
+
+      if (categorias && categorias.length) {
+        const slugsExistentes = new Set(items.map(i => i.slug));
+        categorias.forEach(cat => {
+          const nombre = (cat.nombre || '').trim();
+          const slug = slugifyCategoria(nombre);
+          if (!nombre || slug === 'exclusivos' || slugsExistentes.has(slug)) return;
+          items.push({ slug, href: `${slug}.html`, label: nombre.toUpperCase() });
+          slugsExistentes.add(slug);
+        });
+      }
+
+      menu.innerHTML = items.map(item => `
+        <li>
+          <a href="${item.href}" class="${item.slug === 'index' ? CAT_LINK_ACTIVO : CAT_LINK_BASE}">
+            ${item.label}
+          </a>
+        </li>
+      `).join('');
+    }
+
+    // Renderizar tarjetas de productos
+    function renderizarProductos() {
+      const container = document.getElementById('grid-productos');
+      if (!productos || productos.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 col-span-full text-center py-12">${
+          filtroExclusivos
+            ? 'No hay productos exclusivos por el momento.'
+            : categoriaSeleccionada !== 'todas'
+            ? 'No hay productos en esta categoría.'
+            : 'No hay productos disponibles por el momento.'
+        }</p>`;
+        return;
+      }
+
+      container.innerHTML = productos.map(p => {
+        const esc = window.escapeHtml || ((v) => String(v ?? ''));
+        const img = window.safeUrl
+          ? window.safeUrl(p.img, 'https://via.placeholder.com/300')
+          : (p.img || 'https://via.placeholder.com/300');
+        const idNum = Number(p.id);
+        return `
+        <div class="et-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+          <a href="producto.html?id=${idNum}" class="relative block overflow-hidden">
+            <img src="${esc(img)}" alt="${esc(p.titulo)}" class="w-full h-48 object-cover">
+            ${p.exclusivo ? '<span class="absolute top-3 left-3 bg-taller text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Exclusivo</span>' : ''}
+          </a>
+          <div class="p-4 flex flex-col flex-grow justify-between">
+            <div>
+              <h3 class="font-bold text-gray-800 text-lg mb-1">
+                <a href="producto.html?id=${idNum}" class="hover:text-taller-dark transition">${esc(p.titulo)}</a>
+              </h3>
+              <p class="text-xs text-gray-500 mb-3">${esc(p.categoria || '')}</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xl font-bold text-taller-dark">$${Number(p.precio).toLocaleString()}</span>
+                <span class="${p.stock > 0
+                  ? 'bg-taller-light text-taller-dark border border-taller-accent/30'
+                  : 'bg-red-50 text-red-700 border border-red-200'} text-[10px] font-bold px-2 py-0.5 rounded">
+                  ${p.stock > 0 ? `Stock: ${Number(p.stock)}` : 'Agotado'}
+                </span>
+              </div>
+              <button
+                onclick="agregarAlCarrito(${idNum})"
+                ${p.stock <= 0 ? 'disabled' : ''}
+                class="et-press w-full min-h-[44px] bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg text-xs flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300">
+                <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+
+      if (window.ElTallerMotion) {
+        window.ElTallerMotion.staggerChildren(container, '.et-card');
+        window.ElTallerMotion.initScrollReveal();
+      }
+    }
+
+    function filtrarGrillaPorTexto(query) {
+      const q = (query || '').toLowerCase().trim();
+      const base = productosBase || [];
+      if (!q) {
+        productos = [...base];
+      } else {
+        productos = base.filter((p) => {
+          const titulo = (p.titulo || p.nombre || '').toLowerCase();
+          const categoria = (p.categoria || '').toLowerCase();
+          return titulo.includes(q) || categoria.includes(q);
+        });
+      }
+      renderizarProductos();
+    }
+
+    // Funciones del Carrito
+    function agregarAlCarrito(id) {
+      const prod = productosLookup[id] || productos.find(p => p.id === id);
+      if (!prod) return;
+
+      const itemEnCarrito = carrito.find(item => item.id === id);
+      if (itemEnCarrito) {
+        if (itemEnCarrito.cantidad < prod.stock) {
+          itemEnCarrito.cantidad++;
+        } else {
+          alert('Alcanzaste el límite de stock disponible para este producto.');
+        }
+      } else {
+        carrito.push({
+          id: prod.id,
+          titulo: prod.titulo,
+          precio: prod.precio,
+          cantidad: 1,
+          img: prod.img || null
+        });
+      }
+
+      actualizarCarrito();
+      if (window.ElTallerMotion) {
+        window.ElTallerMotion.toast('¡Agregado al carrito!', 'success');
+      }
+    }
+
+    function guardarCarritoLocal() {
+      try {
+        localStorage.setItem('eltaller_carrito', JSON.stringify(carrito));
+        localStorage.setItem('carrito_items', JSON.stringify(carrito));
+        localStorage.setItem(
+          'eltaller_cupon',
+          cuponAplicado?.codigo
+            ? JSON.stringify({ codigo: cuponAplicado.codigo, tipo: cuponAplicado.tipo, valor: cuponAplicado.valor })
+            : ''
+        );
+      } catch (e) {
+        console.error('No se pudo guardar el carrito:', e);
+      }
+    }
+
+    function cargarCarritoLocal() {
+      try {
+        const raw = localStorage.getItem('eltaller_carrito');
+        carrito = raw ? JSON.parse(raw) : [];
+        const rawCupon = localStorage.getItem('eltaller_cupon');
+        const guardado = rawCupon ? JSON.parse(rawCupon) : null;
+        cuponAplicado = null;
+        if (guardado?.codigo) {
+          const input = document.getElementById('input-cupon');
+          if (input) input.value = guardado.codigo || '';
+          db.rpc('validar_cupon', { p_codigo: String(guardado.codigo) }).then(({ data }) => {
+            if (data?.ok) {
+              cuponAplicado = { codigo: data.codigo, tipo: data.tipo, valor: Number(data.valor) || 0 };
+              mostrarMensajeCupon('Cupón aplicado.', 'text-green-600 font-bold');
+            } else {
+              localStorage.removeItem('eltaller_cupon');
+            }
+            actualizarTotalesCarrito();
+            guardarCarritoLocal();
+          }).catch(() => actualizarTotalesCarrito());
+        }
+      } catch (e) {
+        carrito = [];
+        cuponAplicado = null;
+      }
+    }
+
+    function irAlCheckout() {
+      if (carrito.length === 0) {
+        alert('Agregá al menos un producto al carrito antes de continuar.');
+        return;
+      }
+      guardarCarritoLocal();
+      window.location.href = 'checkout.html';
+    }
+
+    function cambiarCantidad(id, cambio) {
+      const item = carrito.find(i => i.id === id);
+      if (!item) return;
+
+      const prod = productosLookup[id] || productos.find(p => p.id === id);
+
+      item.cantidad += cambio;
+      if (item.cantidad <= 0) {
+        carrito = carrito.filter(i => i.id !== id);
+      } else if (prod && item.cantidad > prod.stock) {
+        item.cantidad = prod.stock;
+        alert('Alcanzaste el límite de stock disponible.');
+      }
+
+      actualizarCarrito();
+    }
+
+    function actualizarCarrito() {
+      const count = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+
+      if (window.ElTallerMotion) {
+        window.ElTallerMotion.updateCartBadge(count);
+      } else {
+        const cartCountEl = document.getElementById('carrito-contador') || document.getElementById('cart-count');
+        if (cartCountEl) {
+          cartCountEl.innerText = count;
+          cartCountEl.classList.toggle('hidden', count === 0);
+        }
+      }
+
+      actualizarTotalesCarrito();
+      guardarCarritoLocal();
+
+      const itemsEl = document.getElementById('items-carrito');
+      if (carrito.length === 0) {
+        itemsEl.innerHTML = `<p class="text-gray-400 text-center py-6">El carrito está vacío.</p>`;
+      } else {
+        const esc = window.escapeHtml || ((v) => String(v ?? ''));
+        itemsEl.innerHTML = carrito.map(item => `
+          <div class="et-row-enter flex justify-between items-center border-b pb-3">
+            <div>
+              <p class="font-semibold text-gray-800 text-sm">${esc(item.titulo)}</p>
+              <p class="text-xs text-gray-500">$${Number(item.precio).toLocaleString()} c/u</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="cambiarCantidad(${Number(item.id)}, -1)" class="et-press w-6 h-6 bg-gray-200 rounded font-bold hover:bg-gray-300 flex items-center justify-center">-</button>
+              <span class="text-sm font-bold w-4 text-center">${esc(item.cantidad)}</span>
+              <button onclick="cambiarCantidad(${Number(item.id)}, 1)" class="et-press w-6 h-6 bg-gray-200 rounded font-bold hover:bg-gray-300 flex items-center justify-center">+</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function actualizarTotalesCarrito() {
+      // Calculamos el subtotal sumando los ítems
+      let subtotal = carrito.reduce((acc, prod) => acc + (prod.precio * prod.cantidad), 0);
+      let descuento = 0;
+
+      // Si hay un cupón válido aplicado
+      if (cuponAplicado) {
+        if (cuponAplicado.tipo === 'porcentaje') {
+          descuento = (subtotal * Number(cuponAplicado.valor)) / 100;
+        } else {
+          descuento = Number(cuponAplicado.valor);
+        }
+      }
+
+      let totalFinal = Math.max(0, subtotal - descuento); // Evita valores negativos
+
+      // Actualizar los elementos HTML
+      document.getElementById('cart-subtotal').innerText = `$${subtotal.toLocaleString('es-AR')}`;
+
+      // Elemento opcional para mostrar cuánto se descontó
+      const elemDesc = document.getElementById('cart-descuento');
+      if (elemDesc) {
+        elemDesc.innerText = `-$${descuento.toLocaleString('es-AR')}`;
+      }
+
+      document.getElementById('cart-total').innerText = `$${totalFinal.toLocaleString('es-AR')}`;
+    }
+
+    async function validarYAplicarCupon() {
+      const input = document.getElementById('input-cupon');
+      const codigo = input.value.trim().toUpperCase();
+
+      if (!codigo) {
+        mostrarMensajeCupon('Por favor ingresá un código.', 'text-red-600');
+        return;
+      }
+
+      const { data, error } = await db.rpc('validar_cupon', { p_codigo: codigo });
+
+      if (error || !data?.ok) {
+        cuponAplicado = null;
+        mostrarMensajeCupon(data?.error || 'El código de cupón no es válido.', 'text-red-600');
+        actualizarTotalesCarrito();
+        return;
+      }
+
+      cuponAplicado = {
+        codigo: data.codigo,
+        tipo: data.tipo,
+        valor: Number(data.valor) || 0
+      };
+      const descTexto = cuponAplicado.tipo === 'porcentaje'
+        ? `${cuponAplicado.valor}%`
+        : `$${Number(cuponAplicado.valor).toLocaleString()}`;
+      mostrarMensajeCupon(`¡Genial! Cupón del ${descTexto} aplicado correctamente.`, 'text-green-600 font-bold');
+
+      actualizarTotalesCarrito();
+      guardarCarritoLocal();
+    }
+
+    function mostrarMensajeCupon(texto, claseColor) {
+      const msg = document.getElementById('msg-cupon');
+      msg.className = `text-[11px] mt-1.5 et-state-flash ${claseColor}`;
+      msg.innerText = texto;
+      msg.classList.remove('hidden');
+    }
+
+    function toggleCarrito() {
+      if (window.ElTallerMotion) {
+        window.ElTallerMotion.toggleCartDrawer();
+        return;
+      }
+      document.getElementById('modal-carrito').classList.toggle('hidden');
+    }
+
+    function toggleMenuMobile() {
+      const menu = document.getElementById('menu-mobile');
+      menu.classList.toggle('hidden');
+    }
+
+    // Cargar y repetir el texto de la marquesina desde Supabase
+    async function cargarMarquesina() {
+      const contenedor = document.getElementById('marquee-content');
+      if (!contenedor) return;
+
+      // Texto por defecto pedido
+      let textoAnuncio = '¡Bienvenidos a nuestra tienda online! Envíos a todo el país 🚚';
+
+      // Consultar Supabase
+      try {
+        const { data, error } = await db
+          .from('configuracion')
+          .select('marquee_texto, marquee_activo')
+          .eq('id', 1)
+          .single();
+
+        if (data) {
+          if (!data.marquee_activo) {
+            document.getElementById('container-marquee')?.classList.add('hidden');
+            return;
+          }
+          if (data.marquee_texto && data.marquee_texto.trim() !== '') {
+            textoAnuncio = data.marquee_texto;
+          }
+        }
+      } catch (e) {
+        console.log('Cargando texto predeterminado en la marquesina...');
+      }
+
+      // Plantilla repetida 3 veces por bloque para asegurar que cubra pantallas anchas
+      const renderBloque = () => `
+        <div class="flex gap-8 items-center shrink-0 pr-8">
+          <span>${textoAnuncio}</span> <span>•</span>
+          <span>${textoAnuncio}</span> <span>•</span>
+          <span>${textoAnuncio}</span> <span>•</span>
+        </div>
+      `;
+
+      // Duplicamos el bloque para que el bucle continuo no tenga saltos visuales
+      contenedor.innerHTML = renderBloque() + renderBloque();
+    }
+
+    // --- Carrusel de banners ---
+    const BANNERS = [
+      {
+        src: 'img/banners/banner-mayorista.png',
+        alt: 'El Taller Mayorista — Mínimo 15 unidades, envíos a todo el país'
+      },
+      {
+        src: 'img/banners/banner-mates-taller.png',
+        alt: 'Mates artesanales El Taller — selección de camioneros y torpedos'
+      },
+      {
+        src: 'img/banners/banner-bombillas-mates.png',
+        alt: 'Mates y bombillas El Taller — calidad mayorista'
+      }
+    ];
+
+    let bannerIndex = 0; // posición en el track (incluye clones)
+    let bannerTimer = null;
+    let bannerAnimando = false;
+
+    function slideBannerHTML(b) {
+      return `
+        <div class="banner-slide">
+          <img src="${b.src}" alt="${b.alt}" loading="eager">
+        </div>
+      `;
+    }
+
+    function initBannerCarousel() {
+      const track = document.getElementById('banner-track');
+      const dots = document.getElementById('banner-dots');
+      const carousel = document.getElementById('banner-carousel');
+      if (!track || !dots || !carousel) return;
+
+      if (!BANNERS.length) {
+        carousel.classList.add('hidden');
+        return;
+      }
+
+      // Track infinito: [último clon] + reales + [primer clon]
+      // Así el deslizamiento siempre sigue hacia un lado, sin “rebobinar”
+      if (BANNERS.length >= 2) {
+        const primero = BANNERS[0];
+        const ultimo = BANNERS[BANNERS.length - 1];
+        track.innerHTML =
+          slideBannerHTML(ultimo) +
+          BANNERS.map(slideBannerHTML).join('') +
+          slideBannerHTML(primero);
+        bannerIndex = 1; // primer slide real
+      } else {
+        track.innerHTML = BANNERS.map(slideBannerHTML).join('');
+        bannerIndex = 0;
+      }
+
+      dots.innerHTML = BANNERS.map((_, i) => `
+        <button type="button" class="banner-dot ${i === 0 ? 'activo' : ''}" onclick="irABanner(${i})" aria-label="Ir al banner ${i + 1}"></button>
+      `).join('');
+
+      track.classList.add('sin-animacion');
+      track.style.transform = `translateX(-${bannerIndex * 100}%)`;
+      // Forzar reflow y reactivar transición
+      void track.offsetHeight;
+      track.classList.remove('sin-animacion');
+
+      track.addEventListener('transitionend', onBannerTransitionEnd);
+
+      if (BANNERS.length < 2) {
+        carousel.querySelectorAll('.banner-btn').forEach(btn => btn.classList.add('hidden'));
+        dots.classList.add('hidden');
+        return;
+      }
+
+      iniciarAutoBanner();
+      carousel.addEventListener('mouseenter', detenerAutoBanner);
+      carousel.addEventListener('mouseleave', iniciarAutoBanner);
+    }
+
+    function indiceRealBanner() {
+      if (BANNERS.length < 2) return 0;
+      // track: [clon último][0][1]...[n-1][clon primero]
+      let real = bannerIndex - 1;
+      if (bannerIndex === 0) real = BANNERS.length - 1;
+      if (bannerIndex === BANNERS.length + 1) real = 0;
+      return real;
+    }
+
+    function actualizarDotsBanner() {
+      const dots = document.getElementById('banner-dots');
+      if (!dots) return;
+      const real = indiceRealBanner();
+      dots.querySelectorAll('.banner-dot').forEach((dot, i) => {
+        dot.classList.toggle('activo', i === real);
+      });
+    }
+
+    function actualizarBanner(conAnimacion = true) {
+      const track = document.getElementById('banner-track');
+      if (!track) return;
+
+      if (!conAnimacion) track.classList.add('sin-animacion');
+      else track.classList.remove('sin-animacion');
+
+      track.style.transform = `translateX(-${bannerIndex * 100}%)`;
+      actualizarDotsBanner();
+
+      if (!conAnimacion) {
+        void track.offsetHeight;
+        track.classList.remove('sin-animacion');
+      }
+    }
+
+    function onBannerTransitionEnd(e) {
+      if (e.propertyName !== 'transform') return;
+      if (BANNERS.length < 2) return;
+
+      const track = document.getElementById('banner-track');
+      if (!track) return;
+
+      // Si llegamos al clon del primero (al final), saltamos al primero real sin animación
+      if (bannerIndex === BANNERS.length + 1) {
+        bannerIndex = 1;
+        actualizarBanner(false);
+      }
+      // Si llegamos al clon del último (al inicio), saltamos al último real
+      if (bannerIndex === 0) {
+        bannerIndex = BANNERS.length;
+        actualizarBanner(false);
+      }
+
+      bannerAnimando = false;
+    }
+
+    function moverBanner(dir) {
+      if (BANNERS.length < 2 || bannerAnimando) return;
+      bannerAnimando = true;
+      bannerIndex += dir;
+      actualizarBanner(true);
+      reiniciarAutoBanner();
+    }
+
+    function irABanner(i) {
+      if (BANNERS.length < 2 || bannerAnimando) return;
+      bannerAnimando = true;
+      bannerIndex = i + 1; // +1 por el clon al inicio
+      actualizarBanner(true);
+      reiniciarAutoBanner();
+    }
+
+    function iniciarAutoBanner() {
+      if (BANNERS.length < 2) return;
+      detenerAutoBanner();
+      bannerTimer = setInterval(() => moverBanner(1), 5000);
+    }
+
+    function detenerAutoBanner() {
+      if (bannerTimer) {
+        clearInterval(bannerTimer);
+        bannerTimer = null;
+      }
+    }
+
+    function reiniciarAutoBanner() {
+      detenerAutoBanner();
+      iniciarAutoBanner();
+    }
+
+    // INVOCACIÓN OBLIGATORIA AL CARGAR LA PÁGINA
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarCarritoLocal();
+      actualizarCarrito();
+      cargarMarquesina();
+      cargarCategoriasHeader();
+      initBannerCarousel();
+      cargarCarruselesPortada();
+      cargarProductos();
+    });
+  </script>
+</body>
+</html>

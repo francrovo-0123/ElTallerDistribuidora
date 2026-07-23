@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="Pedido confirmado - El Taller Distribuidora.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>¡Pedido Realizado! - El Taller Distribuidora</title>
+  <link rel="stylesheet" href="output.css">
+  <script src="motion.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-6 font-sans antialiased">
+
+  <div class="bg-white rounded-3xl shadow-xl border border-gray-100 max-w-md w-full p-8 text-center space-y-6">
+
+    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+      <i class="fa-solid fa-check"></i>
+    </div>
+
+    <div>
+      <h1 class="text-xl font-black text-gray-900 uppercase tracking-wider">¡Pedido Registrado con Éxito!</h1>
+      <p class="text-xs text-gray-500 font-medium mt-2 leading-relaxed">
+        Muchas gracias por tu compra en El Taller Distribuidora. Ya guardamos tu orden correctamente.
+      </p>
+    </div>
+
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left space-y-2">
+      <p class="text-xs font-black text-amber-900 uppercase tracking-wide flex items-center gap-1.5">
+        <i class="fa-solid fa-triangle-exclamation"></i> Siguiente paso importante:
+      </p>
+      <p class="text-[11px] text-amber-800 font-medium leading-relaxed">
+        Recordá enviar el comprobante de la transferencia por WhatsApp para agilizar el despacho de tu pedido.
+      </p>
+    </div>
+
+    <div class="pt-2 flex flex-col gap-3">
+      <a id="btn-whatsapp-pedido" href="https://wa.me/5492236872975" target="_blank" rel="noopener noreferrer"
+        class="w-full bg-[#25D366] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:bg-[#1ebe57] transition shadow-md flex items-center justify-center gap-2">
+        <i class="fa-brands fa-whatsapp text-base"></i> Enviar comprobante por WhatsApp
+      </a>
+      <a href="index.html" class="w-full bg-[#3D5239] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:bg-[#2c3d29] transition shadow-md flex items-center justify-center gap-2">
+        <i class="fa-solid fa-store"></i> Volver a la tienda
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    try {
+      const urlWa = sessionStorage.getItem('eltaller_wa_url');
+      if (urlWa) {
+        const btn = document.getElementById('btn-whatsapp-pedido');
+        if (btn) btn.href = urlWa;
+        sessionStorage.removeItem('eltaller_wa_url');
+      }
+    } catch (e) {}
+  </script>
+
+</body>
+</html>

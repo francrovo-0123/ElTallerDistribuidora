@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Regalos Empresariales - El Taller</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="site-navbar"></div>
+  <script src="motion.js"></script>
+  <script src="navbar.js"></script>
+
+  <main class="flex-grow w-full">
+    <section class="bg-[#1A2218] text-white">
+      <div class="max-w-2xl mx-auto px-6 py-14 md:py-20">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#9BB08F] mb-3">Empresas</p>
+        <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tight">Regalos Empresariales</h1>
+        <p class="mt-4 text-sm md:text-base text-gray-300 leading-relaxed">
+          Armamos sets y presentes corporativos a medida. Contanos qué necesitás y te respondemos por WhatsApp.
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-2xl mx-auto px-6 py-12 md:py-16">
+      <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-2">
+        Consultá por WhatsApp
+      </h2>
+      <p class="text-sm text-gray-500 mb-6">
+        Completá el formulario y te enviamos opciones y presupuesto.
+      </p>
+
+      <form id="form-regalos-wpp" class="space-y-4" novalidate>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="regalo-nombre" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Nombre</label>
+            <input id="regalo-nombre" type="text" required
+              class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+              placeholder="Tu nombre">
+          </div>
+          <div>
+            <label for="regalo-empresa" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Empresa</label>
+            <input id="regalo-empresa" type="text"
+              class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+              placeholder="Nombre de la empresa">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="regalo-cantidad" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Cantidad aproximada</label>
+            <input id="regalo-cantidad" type="text"
+              class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+              placeholder="Ej: 50 unidades">
+          </div>
+          <div>
+            <label for="regalo-presupuesto" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Presupuesto (opcional)</label>
+            <input id="regalo-presupuesto" type="text"
+              class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition"
+              placeholder="Ej: $15.000 c/u">
+          </div>
+        </div>
+        <div>
+          <label for="regalo-mensaje" class="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Detalle del pedido</label>
+          <textarea id="regalo-mensaje" rows="4" required
+            class="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#3D5239] transition resize-y"
+            placeholder="Ej: sets de mate con logo, fecha de entrega, personalización..."></textarea>
+        </div>
+        <button type="submit"
+          class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe57] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-lg transition">
+          <i class="fa-brands fa-whatsapp text-sm"></i> Consultar por WhatsApp
+        </button>
+        <p id="msg-regalos" class="text-xs text-red-600 hidden"></p>
+      </form>
+    </section>
+  </main>
+
+  <div id="modal-carrito" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end hidden">
+    <div class="bg-white w-full max-w-md h-full flex flex-col justify-between p-6 shadow-xl overflow-y-auto">
+      <div>
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <h2 class="text-xl font-bold text-gray-800">Tu Carrito</h2>
+          <button onclick="toggleCarrito()" class="text-gray-500 text-xl font-bold">&times;</button>
+        </div>
+        <div id="items-carrito" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2"></div>
+      </div>
+      <div class="border-t pt-4 mt-4">
+        <div class="space-y-1 text-sm mb-4">
+          <div class="flex justify-between text-gray-600"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+          <div class="flex justify-between text-gray-600"><span>Descuento</span><span id="cart-descuento">-$0</span></div>
+          <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="cart-total">$0</span></div>
+        </div>
+        <button onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+  <script src="carrito-lite.js"></script>
+  <script>
+    document.getElementById('form-regalos-wpp')?.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nombre = document.getElementById('regalo-nombre').value.trim();
+      const empresa = document.getElementById('regalo-empresa').value.trim();
+      const cantidad = document.getElementById('regalo-cantidad').value.trim();
+      const presupuesto = document.getElementById('regalo-presupuesto').value.trim();
+      const mensaje = document.getElementById('regalo-mensaje').value.trim();
+      const aviso = document.getElementById('msg-regalos');
+
+      if (!nombre || !mensaje) {
+        aviso.textContent = 'Completá al menos tu nombre y el detalle del pedido.';
+        aviso.classList.remove('hidden');
+        return;
+      }
+
+      aviso.classList.add('hidden');
+
+      const texto =
+        'Hola, consulto por *Regalos Empresariales*:\n\n' +
+        '• Nombre: ' + nombre + '\n' +
+        (empresa ? '• Empresa: ' + empresa + '\n' : '') +
+        (cantidad ? '• Cantidad: ' + cantidad + '\n' : '') +
+        (presupuesto ? '• Presupuesto: ' + presupuesto + '\n' : '') +
+        '• Detalle: ' + mensaje;
+
+      window.open(
+        'https://wa.me/5492236872975?text=' + encodeURIComponent(texto),
+        '_blank',
+        'noopener,noreferrer'
+      );
+    });
+  </script>
+</body>
+</html>

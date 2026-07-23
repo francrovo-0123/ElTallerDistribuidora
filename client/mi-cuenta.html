@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Mi cuenta - El Taller</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="supabase-config.js"></script>
+  <script src="security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <div id="site-navbar"></div>
+  <script src="motion.js"></script>
+  <script src="navbar.js"></script>
+
+  <main class="flex-grow w-full">
+    <section class="bg-[#1A2218] text-white">
+      <div class="max-w-5xl mx-auto px-6 py-14 md:py-20">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#9BB08F] mb-3">Tu espacio</p>
+        <h1 class="text-3xl md:text-4xl font-black uppercase tracking-tight">Mi cuenta</h1>
+        <p id="cuenta-hero-email" class="mt-4 text-sm md:text-base text-gray-300 leading-relaxed max-w-2xl">
+          Cargando tu sesión…
+        </p>
+      </div>
+    </section>
+
+    <div id="cuenta-sin-sesion" class="hidden max-w-5xl mx-auto px-6 py-16 text-center">
+      <p class="text-sm text-gray-600 mb-6">Tenés que iniciar sesión para ver tu cuenta.</p>
+      <button type="button" onclick="abrirModalAuth('login')"
+        class="inline-flex items-center gap-2 bg-[#3D5239] text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#2c3d29] transition">
+        <i class="fa-solid fa-user"></i> Iniciar sesión
+      </button>
+    </div>
+
+    <div id="cuenta-contenido" class="hidden max-w-5xl mx-auto px-6 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10">
+      <aside class="space-y-1 text-sm">
+        <a href="#resumen" class="block px-3 py-2 rounded-lg hover:bg-white text-gray-700 font-medium transition">Resumen</a>
+        <a href="#perfil" class="block px-3 py-2 rounded-lg hover:bg-white text-gray-700 font-medium transition">Mi perfil</a>
+        <a href="#pedidos" class="block px-3 py-2 rounded-lg hover:bg-white text-gray-700 font-medium transition">Mis pedidos</a>
+        <a href="#configuracion" class="block px-3 py-2 rounded-lg hover:bg-white text-gray-700 font-medium transition">Configuración</a>
+        <button type="button" onclick="cerrarSesionCliente()"
+          class="w-full text-left px-3 py-2 rounded-lg text-[#8B2E2E] font-medium hover:bg-red-50 transition mt-4">
+          Cerrar sesión
+        </button>
+      </aside>
+
+      <div class="space-y-12">
+        <section id="resumen" class="scroll-mt-24">
+          <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Resumen</h2>
+          <p class="text-sm text-gray-600 leading-relaxed">
+            Hola<span id="resumen-nombre"></span>. Desde acá podés ver tu perfil, el estado de tus pedidos y la configuración de tu cuenta.
+          </p>
+          <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div class="bg-white border border-gray-100 px-4 py-4">
+              <dt class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Correo</dt>
+              <dd id="resumen-email" class="mt-1 font-semibold text-gray-900 break-all">—</dd>
+            </div>
+            <div class="bg-white border border-gray-100 px-4 py-4">
+              <dt class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Miembro desde</dt>
+              <dd id="resumen-desde" class="mt-1 font-semibold text-gray-900">—</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section id="perfil" class="scroll-mt-24">
+          <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Mi perfil</h2>
+          <dl class="space-y-4 text-sm max-w-md">
+            <div>
+              <dt class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Nombre</dt>
+              <dd id="perfil-nombre" class="font-semibold text-gray-900">—</dd>
+            </div>
+            <div>
+              <dt class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Correo electrónico</dt>
+              <dd id="perfil-email" class="font-semibold text-gray-900 break-all">—</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section id="pedidos" class="scroll-mt-24">
+          <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Mis pedidos</h2>
+          <p class="text-sm text-gray-600 leading-relaxed mb-6">
+            Historial de compras asociadas a tu cuenta. Si necesitás ayuda con un pedido, escribinos por WhatsApp.
+          </p>
+          <div id="contenedor-mis-pedidos" class="space-y-3">
+            <p class="text-xs text-gray-500">Cargando tus pedidos…</p>
+          </div>
+          <a href="https://wa.me/5492236872975?text=Hola%2C%20quiero%20consultar%20el%20estado%20de%20mi%20pedido."
+            target="_blank" rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 mt-6 text-xs font-black uppercase tracking-widest text-[#3D5239] hover:underline">
+            <i class="fa-brands fa-whatsapp text-emerald-500 text-sm"></i> Consultar por WhatsApp
+          </a>
+        </section>
+
+        <section id="configuracion" class="scroll-mt-24">
+          <h2 class="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#3D5239] pl-3 mb-4">Configuración</h2>
+          <p class="text-sm text-gray-600 mb-5">Podés cerrar tu sesión en este dispositivo.</p>
+          <button type="button" onclick="cerrarSesionCliente()"
+            class="inline-flex items-center gap-2 px-5 py-2.5 border border-[#8B2E2E]/30 text-[#8B2E2E] text-xs font-black uppercase tracking-widest hover:bg-red-50 transition rounded-xl">
+            <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+          </button>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="footer.js"></script>
+
+  <script>
+    const SUPABASE_URL = ELTALLER_SUPABASE.url;
+    const SUPABASE_KEY = ELTALLER_SUPABASE.anonKey;
+
+    function getDb() {
+      if (window.db) return window.db;
+      if (typeof supabase === 'undefined') return null;
+      window.db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      return window.db;
+    }
+
+    async function cargarMisPedidos() {
+      const contenedor = document.getElementById('contenedor-mis-pedidos');
+      if (!contenedor) return;
+      const esc = window.escapeHtml || ((v) => String(v ?? ''));
+
+      const db = getDb();
+      if (!db) {
+        contenedor.innerHTML = "<p class='text-xs text-gray-500'>No se pudo conectar con la base de datos.</p>";
+        return;
+      }
+
+      const { data: { session } } = await db.auth.getSession();
+
+      if (!session) {
+        contenedor.innerHTML = "<p class='text-xs text-gray-500'>Debes iniciar sesión para ver tu historial de pedidos.</p>";
+        return;
+      }
+
+      const emailUsuario = session.user.email;
+      const userId = session.user.id;
+
+      // Preferir user_id; fallback email solo para pedidos guest (RLS también filtra)
+      const { data: porUserId, error: errUser } = await db
+        .from('pedidos')
+        .select('id,total,estado,created_at,fecha,codigo_seguimiento,user_id,cliente_email')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      let pedidos = porUserId || [];
+      let error = errUser;
+
+      if ((!pedidos || pedidos.length === 0) && emailUsuario) {
+        const { data: porEmail, error: errEmail } = await db
+          .from('pedidos')
+          .select('id,total,estado,created_at,fecha,codigo_seguimiento,user_id,cliente_email')
+          .eq('cliente_email', emailUsuario)
+          .is('user_id', null)
+          .order('created_at', { ascending: false });
+        pedidos = porEmail || [];
+        error = errEmail;
+      }
+
+      if (error || !pedidos || pedidos.length === 0) {
+        if (error) console.error('Error al cargar pedidos:', error);
+        contenedor.innerHTML = "<p class='text-xs text-gray-500 font-medium'>Aún no tenés pedidos registrados.</p>";
+        return;
+      }
+
+      let html = '';
+      pedidos.forEach((p) => {
+        const fechaRaw = p.fecha || p.created_at;
+        const fechaTexto = fechaRaw
+          ? new Date(fechaRaw).toLocaleDateString('es-AR')
+          : '—';
+
+        html += `
+          <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-black uppercase">
+              <span class="text-[#3D5239]">Orden #${esc(p.id)}</span>
+              <span class="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[10px]">${esc(p.estado || 'Pendiente')}</span>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">Total: <strong class="text-gray-900">$${Number(p.total || 0).toLocaleString('es-AR')}</strong></p>
+            <p class="text-[10px] text-gray-400">Fecha: ${esc(fechaTexto)}</p>
+            ${p.codigo_seguimiento ? `<p class="text-xs text-gray-700 font-medium">Seguimiento: <strong class="text-[#3D5239]">${esc(p.codigo_seguimiento)}</strong></p>` : ''}
+          </div>
+        `;
+      });
+
+      contenedor.innerHTML = html;
+    }
+
+    async function initMiCuenta() {
+      const db = getDb();
+      const sinSesion = document.getElementById('cuenta-sin-sesion');
+      const contenido = document.getElementById('cuenta-contenido');
+      const heroEmail = document.getElementById('cuenta-hero-email');
+
+      if (!db) {
+        heroEmail.innerText = 'No se pudo cargar la sesión.';
+        sinSesion.classList.remove('hidden');
+        return;
+      }
+
+      const { data: { session } } = await db.auth.getSession();
+
+      if (!session?.user) {
+        heroEmail.innerText = 'Iniciá sesión para gestionar tu cuenta.';
+        sinSesion.classList.remove('hidden');
+        return;
+      }
+
+      const user = session.user;
+      const email = user.email || '';
+
+      if (esEmailAdmin(email)) {
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      const meta = user.user_metadata || {};
+      const nombre = meta.full_name || meta.nombre || '';
+      const desde = user.created_at
+        ? new Date(user.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })
+        : '—';
+
+      heroEmail.innerText = email;
+      document.getElementById('resumen-nombre').innerText = nombre ? `, ${nombre}` : '';
+      document.getElementById('resumen-email').innerText = email;
+      document.getElementById('resumen-desde').innerText = desde;
+      document.getElementById('perfil-nombre').innerText = nombre || 'Sin nombre cargado';
+      document.getElementById('perfil-email').innerText = email;
+
+      contenido.classList.remove('hidden');
+      await cargarMisPedidos();
+
+      if (location.hash) {
+        const target = document.querySelector(location.hash);
+        if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMiCuenta();
+    });
+  </script>
+</body>
+</html>

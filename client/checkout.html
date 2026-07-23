@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO y Metadatos -->
+  <meta name="description" content="El Taller Distribuidora - Catálogo oficial mayorista y minorista. Envíos y la mejor calidad.">
+  <meta name="author" content="El Taller Distribuidora">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="El Taller Distribuidora">
+  <meta property="og:image" content="https://eltallerdistribuidora.com/eltaller.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="eltaller.png">
+  <title>Checkout - El Taller</title>
+  <link rel="stylesheet" href="output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="security.js"></script>
+</head>
+<body class="bg-[#F2F2F2] font-sans antialiased text-gray-800 min-h-screen">
+
+  <!-- HEADER CHECKOUT -->
+  <header class="bg-white border-b border-gray-200 py-3 px-6 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-600">
+    <a href="index.html" class="flex items-center gap-2 hover:text-black transition font-bold">
+      <i class="fa-solid fa-chevron-left text-[10px]"></i> Seguir comprando
+    </a>
+
+    <!-- LOGO -->
+    <a href="index.html" class="flex items-center gap-2">
+      <img src="eltaller.png" alt="El Taller Distribuidora" class="w-10 h-10 object-contain">
+    </a>
+
+    <div class="flex items-center gap-1.5 text-gray-500 font-bold text-[11px]">
+      <i class="fa-solid fa-lock text-xs text-green-700"></i> COMPRA SEGURA
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-6 md:py-8">
+
+    <!-- STEPPER (PASOS) -->
+    <div class="flex items-center justify-center gap-4 mb-8 text-xs font-bold uppercase tracking-wider">
+      <div class="flex items-center gap-2" id="step-indicator-1">
+        <span class="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center" id="step-num-1">1</span>
+        <span class="text-black font-black" id="step-label-1">Entrega</span>
+      </div>
+      <div class="w-12 h-[1px] bg-gray-300"></div>
+      <div class="flex items-center gap-2" id="step-indicator-2">
+        <span class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center text-gray-400" id="step-num-2">2</span>
+        <span class="text-gray-400" id="step-label-2">Pago</span>
+      </div>
+      <div class="w-12 h-[1px] bg-gray-300"></div>
+      <div class="flex items-center gap-2" id="step-indicator-3">
+        <span class="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center text-gray-400" id="step-num-3">3</span>
+        <span class="text-gray-400" id="step-label-3">Confirmación</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- COLUMNA IZQUIERDA: PASOS DEL CHECKOUT -->
+      <div class="lg:col-span-7 space-y-4">
+
+        <!-- EMAIL / CLIENTE -->
+        <div class="text-xs font-bold uppercase tracking-wider text-gray-400">
+          COMPRANDO COMO
+          <div class="text-sm font-bold text-black normal-case" id="checkout-email-user">Completá tus datos</div>
+        </div>
+
+        <!-- PASO 1: DATOS DE ENTREGA -->
+        <div class="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm" id="bloque-paso-1">
+          <div class="p-4 bg-gray-50/50 flex items-center justify-between border-b border-gray-100 cursor-pointer" onclick="irAlPaso(1)">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">1</span>
+              <h2 class="font-extrabold text-sm tracking-wider uppercase text-gray-900">Datos de Entrega</h2>
+            </div>
+            <button type="button" id="btn-editar-entrega" class="text-xs font-bold underline text-gray-500 hover:text-black hidden">EDITAR</button>
+          </div>
+
+          <!-- Resumen colapsado -->
+          <div id="resumen-paso-1" class="px-6 py-4 text-sm text-gray-600 hidden space-y-1">
+            <p id="resumen-nombre" class="font-semibold text-gray-900"></p>
+            <p id="resumen-telefono"></p>
+            <p id="resumen-direccion"></p>
+            <p id="resumen-email" class="text-gray-500"></p>
+          </div>
+
+          <!-- Formulario Paso 1 -->
+          <div id="contenido-paso-1" class="p-6 space-y-4">
+            <form id="form-entrega" onsubmit="guardarEntrega(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Nombre completo *</label>
+                  <input type="text" id="cliente-nombre" required
+                    class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400"
+                    placeholder="Ej: Juan Pérez">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Teléfono / WhatsApp *</label>
+                  <input type="tel" id="cliente-telefono" required
+                    class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400"
+                    placeholder="Ej: 2494123456">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Email</label>
+                <input type="email" id="cliente-email"
+                  class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400"
+                  placeholder="Ej: juan@email.com">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Dirección de entrega *</label>
+                <input type="text" id="cliente-direccion" required
+                  class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400"
+                  placeholder="Ej: Av. España 1234, Tandil">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Notas (opcional)</label>
+                <textarea id="cliente-notas" rows="2"
+                  class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400 resize-none"
+                  placeholder="Referencias, horario de entrega, etc."></textarea>
+              </div>
+              <div class="pt-2 flex justify-end">
+                <button type="submit"
+                  class="px-8 py-3 bg-black text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-gray-800 transition shadow-md">
+                  Continuar a Pago
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- PASO 2: MÉTODO DE PAGO -->
+        <div id="bloque-paso-2" class="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm p-6 space-y-4 opacity-50 pointer-events-none">
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center" id="paso2-badge">2</span>
+            <h2 class="font-extrabold text-sm tracking-wider uppercase text-gray-900" id="paso2-titulo">Método de Pago</h2>
+          </div>
+
+          <div id="contenido-paso-2" class="hidden space-y-4">
+            <p class="text-xs text-gray-500 font-medium">El pago se realiza por transferencia bancaria.</p>
+
+            <div class="space-y-3 pt-2">
+              <div class="border-2 border-black bg-white rounded-md p-4 relative shadow-sm">
+                <div>
+                  <h3 class="font-bold text-sm text-gray-900">Transferencia bancaria</h3>
+                  <p class="text-xs text-gray-500 mt-0.5">Coordinás el pago por WhatsApp y enviás el comprobante.</p>
+                </div>
+                <div class="mt-3">
+                  <span class="text-base font-black text-black" id="monto-transferencia-nuevo">$ 0,00</span>
+                  <span class="hidden line-through text-xs text-gray-400 font-semibold" id="monto-transferencia-viejo"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CBU / ALIAS PARA TRANSFERIR -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2">
+              <p class="text-xs font-black uppercase text-gray-800 tracking-wider">Datos para la transferencia:</p>
+              <div class="text-xs text-gray-600 space-y-1 font-medium">
+                <p><strong>Banco:</strong> Banco Provincia</p>
+                <p><strong>Titular:</strong> El Taller Distribuidora</p>
+                <p><strong>Alias:</strong> <span class="text-[#3D5239] font-black" id="alias-texto">ELTALLER.DISTRIBUIDORA</span></p>
+                <p><strong>CBU / CVU:</strong> 0000003100000000000000</p>
+              </div>
+              <p class="text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg mt-2 font-medium">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Recordá enviar el comprobante por WhatsApp para confirmar tu pedido.
+              </p>
+            </div>
+
+            <!-- BOTONES DE NAVEGACIÓN -->
+            <div class="pt-4 flex items-center justify-between">
+              <button type="button" onclick="irAlPaso(1)" class="px-6 py-3 border border-gray-300 rounded text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition">
+                Volver
+              </button>
+              <button type="button" id="btn-continuar-whatsapp" onclick="completarPedidoYWhatsApp()" class="px-8 py-3 bg-black text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-gray-800 transition shadow-md flex items-center gap-2">
+                <i class="fa-brands fa-whatsapp text-base text-green-400"></i> CONTINUAR A CONFIRMACIÓN
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 3: CONFIRMACIÓN -->
+        <div id="bloque-paso-3" class="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm opacity-50 pointer-events-none">
+          <div class="p-4 flex items-center gap-3" id="paso3-header">
+            <span class="w-6 h-6 rounded-full border border-gray-400 text-gray-500 text-xs font-bold flex items-center justify-center" id="paso3-badge">3</span>
+            <h2 class="font-extrabold text-sm tracking-wider uppercase text-gray-500" id="paso3-titulo">Confirmación</h2>
+          </div>
+
+          <div id="contenido-paso-3" class="hidden p-6 pt-0 space-y-5">
+            <p class="text-xs text-gray-500 font-medium">Revisá tu pedido antes de confirmar.</p>
+
+            <div class="bg-gray-50 rounded-md p-4 space-y-2 text-sm border border-gray-100">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Entrega a</span>
+                <span class="font-semibold text-gray-900 text-right" id="conf-nombre"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Dirección</span>
+                <span class="font-medium text-gray-800 text-right max-w-[60%]" id="conf-direccion"></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Método de pago</span>
+                <span class="font-semibold text-gray-900" id="conf-metodo"></span>
+              </div>
+              <div class="flex justify-between border-t border-gray-200 pt-2 mt-2">
+                <span class="text-gray-500">Total a pagar</span>
+                <span class="font-black text-lg text-black" id="conf-total"></span>
+              </div>
+            </div>
+
+            <div id="aviso-transferencia" class="bg-amber-50 border border-amber-200 rounded-md p-3 text-xs text-amber-900">
+              <p class="font-bold mb-1">Transferencia bancaria</p>
+              <p>Al confirmar se abrirá WhatsApp para coordinar el pago y enviarnos el comprobante.</p>
+            </div>
+
+            <div class="pt-2 flex items-center justify-between">
+              <button type="button" onclick="irAlPaso(2)" class="px-6 py-3 border border-gray-300 rounded text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition">
+                Volver
+              </button>
+              <button type="button" id="btn-confirmar-pedido" onclick="completarPedidoYWhatsApp()" class="px-8 py-3 bg-black text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-gray-800 transition shadow-md flex items-center gap-2">
+                <i class="fa-brands fa-whatsapp text-base text-green-400"></i> Confirmar Pedido
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: RESUMEN DEL PEDIDO -->
+      <div class="lg:col-span-5">
+        <div class="bg-white rounded-md border border-gray-200 p-6 shadow-sm sticky top-6 space-y-4">
+          <h2 class="font-extrabold text-sm tracking-wider uppercase text-gray-900 border-b border-gray-100 pb-3">
+            Resumen del Pedido
+          </h2>
+
+          <!-- LISTA DE PRODUCTOS -->
+          <div id="resumen-items-lista" class="space-y-3 max-h-60 overflow-y-auto">
+            <p class="text-xs text-gray-400 text-center py-4">Cargando productos...</p>
+          </div>
+
+          <!-- CUPÓN DE DESCUENTO -->
+          <div class="bg-gray-50/70 p-3 rounded-md border border-gray-200/80 space-y-1.5">
+            <span class="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider block">CUPÓN DE DESCUENTO</span>
+            <div class="flex gap-2">
+              <input type="text" id="cupon-codigo" placeholder="CÓDIGO"
+                class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-black uppercase">
+              <button type="button" onclick="aplicarCupon()" class="bg-black text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-gray-800 transition">
+                Aplicar
+              </button>
+            </div>
+            <p id="msg-cupon" class="text-[11px] mt-1 hidden"></p>
+          </div>
+
+          <!-- TOTALES Y ENVÍO A COORDINAR -->
+          <div class="border-t border-gray-100 pt-3 space-y-2 text-xs font-medium text-gray-600">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span class="font-bold text-gray-900" id="resumen-subtotal">$ 0,00</span>
+            </div>
+
+            <!-- Fila dinámica para el cupón (oculta por defecto) -->
+            <div class="flex justify-between text-green-700 font-bold" id="fila-descuento-cupon" style="display: none;">
+              <span>Descuento Cupón</span>
+              <span id="monto-descuento-cupon">-$ 0,00</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span>Envío</span>
+              <span class="font-semibold text-gray-500 italic text-[11px]" id="resumen-envio">A coordinar</span>
+            </div>
+
+            <div class="border-t border-gray-200 pt-3 flex justify-between items-baseline">
+              <span class="text-sm font-bold text-gray-900">Total</span>
+              <span class="text-xl font-black text-black" id="resumen-total">$ 0,00</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="motion.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>
