@@ -60,9 +60,19 @@ function renderNavCategorias() {
 async function cargarProductosPorCategoria() {
   const tituloEl = document.getElementById('titulo-categoria');
   const contadorEl = document.getElementById('contador-productos');
+  const grilla = document.getElementById('grilla-productos');
 
   if (tituloEl) {
     tituloEl.textContent = pagina?.titulo || (ES_EXCLUSIVOS ? 'Exclusivos' : `Mates ${CATEGORIA_ACTUAL}`);
+  }
+
+  if (grilla && window.ElTallerMotion) {
+    window.ElTallerMotion.showSkeletons(
+      grilla,
+      window.ElTallerMotion.renderProductSkeletons(10)
+    );
+  } else if (grilla) {
+    grilla.innerHTML = `<p class="col-span-full text-center text-gray-400 py-12 text-xs font-medium">Cargando productos...</p>`;
   }
 
   let query = db.from('productos').select('*');
@@ -79,9 +89,9 @@ async function cargarProductosPorCategoria() {
   if (error) {
     console.error('Error cargando categoría:', error);
     if (contadorEl) contadorEl.innerText = 'Error al cargar';
-    const grilla = document.getElementById('grilla-productos');
     if (grilla) {
       grilla.innerHTML = `<p class="col-span-full text-center text-red-500 py-12 text-xs font-medium">Error al cargar productos.</p>`;
+      if (window.ElTallerMotion) window.ElTallerMotion.clearBusy(grilla);
     }
     return;
   }
@@ -106,52 +116,22 @@ function renderizarGrilla(productos) {
 
   if (!productos.length) {
     grilla.innerHTML = `<p class="col-span-full text-center text-gray-400 py-12 text-xs font-medium">No hay productos disponibles en esta categoría.</p>`;
+    if (window.ElTallerMotion) window.ElTallerMotion.clearBusy(grilla);
     return;
   }
 
   productos.forEach(prod => {
-    const esc = window.escapeHtml || ((v) => String(v ?? ''));
-    const imgOk = window.safeUrl
-      ? window.safeUrl(prod.img || prod.imagen_url, 'https://via.placeholder.com/300')
-      : (prod.img || prod.imagen_url || 'https://via.placeholder.com/300');
-    const nombre = esc(prod.titulo || prod.nombre || 'Producto');
-    const precio = Number(prod.precio) || 0;
-    const sinStock = Number(prod.stock) <= 0;
-    const idNum = Number(prod.id);
-
-    const cardHTML = `
-      <div class="et-card bg-white rounded-xl border border-gray-200 overflow-hidden group flex flex-col justify-between">
-        <a href="producto.html?id=${idNum}" class="relative overflow-hidden aspect-square bg-gray-100 block">
-          <img src="${esc(imgOk)}" alt="${nombre}" class="w-full h-full object-cover">
-          ${prod.exclusivo ? '<span class="absolute top-3 left-3 bg-taller text-white text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Exclusivo</span>' : ''}
-        </a>
-
-        <div class="p-4 flex flex-col justify-between flex-grow">
-          <div>
-            <h3 class="font-bold text-gray-900 text-xs line-clamp-2">
-              <a href="producto.html?id=${idNum}" class="hover:text-taller-dark transition">${nombre}</a>
-            </h3>
-          </div>
-
-          <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between">
-            <span class="text-sm font-black text-gray-900">$ ${precio.toLocaleString('es-AR')}</span>
-            <button
-              type="button"
-              onclick="agregarAlCarrito(${idNum})"
-              ${sinStock ? 'disabled' : ''}
-              class="et-press w-11 h-11 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              aria-label="Agregar al carrito">
-              <i class="fa-solid fa-plus text-[10px]"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-    grilla.insertAdjacentHTML('beforeend', cardHTML);
+    const cardHTML = typeof renderProductCard === 'function'
+      ? renderProductCard(prod, { variant: 'grid' })
+      : '';
+    if (cardHTML) grilla.insertAdjacentHTML('beforeend', cardHTML);
   });
 
   if (window.ElTallerMotion) {
-    window.ElTallerMotion.staggerChildren(grilla, '.et-card');
+    window.ElTallerMotion.clearBusy(grilla);
+    window.ElTallerMotion.staggerChildren(grilla, '.et-product-card');
+    window.ElTallerMotion.enhanceButtons(grilla);
+    window.ElTallerMotion.bindImageFades(grilla);
   }
 }
 
@@ -320,9 +300,9 @@ function actualizarCarrito() {
           <p class="text-xs text-gray-500">$${Number(item.precio).toLocaleString('es-AR')} c/u</p>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="cambiarCantidad(${Number(item.id)}, -1)" class="et-press w-6 h-6 bg-gray-200 rounded font-bold hover:bg-gray-300 flex items-center justify-center">-</button>
-          <span class="text-sm font-bold w-4 text-center">${esc(item.cantidad)}</span>
-          <button onclick="cambiarCantidad(${Number(item.id)}, 1)" class="et-press w-6 h-6 bg-gray-200 rounded font-bold hover:bg-gray-300 flex items-center justify-center">+</button>
+          <button onclick="cambiarCantidad(${Number(item.id)}, -1)" class="et-btn-icon et-press w-6 h-6 bg-gray-200 rounded font-bold hover:bg-gray-300 flex items-center justify-center">-</button>
+          <span class="et-qty-value text-sm font-bold w-4 text-center">${esc(item.cantidad)}</span>
+          <button onclick="cambiarCantidad(${Number(item.id)}, 1)" class="et-btn-icon et-press w-6 h-6 bg-gray-200 rounded font-bold hover:bg-gray-300 flex items-center justify-center">+</button>
         </div>
       </div>
     `).join('');
@@ -398,14 +378,18 @@ function toggleCarrito() {
   document.getElementById('modal-carrito')?.classList.toggle('hidden');
 }
 
-function toggleMenuMobile() {
-  const menu = document.getElementById('menu-mobile');
-  menu.classList.toggle('hidden');
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+  const header = document.querySelector('main > div.flex');
+  const grilla = document.getElementById('grilla-productos');
+  if (header && !header.hasAttribute('data-reveal')) header.setAttribute('data-reveal', '');
+  if (grilla && !grilla.hasAttribute('data-reveal')) grilla.setAttribute('data-reveal', '');
+
   renderNavCategorias();
   cargarCarritoLocal();
   actualizarCarrito();
   cargarProductosPorCategoria();
+
+  if (window.ElTallerMotion) {
+    window.ElTallerMotion.initScrollReveal();
+  }
 });

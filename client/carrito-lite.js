@@ -107,9 +107,9 @@ function renderizarModalCarritoLite() {
             <p class="text-xs font-bold text-gray-900 truncate">${esc(item.titulo || item.nombre || 'Producto')}</p>
             <p class="text-xs text-gray-500 mt-0.5">${formatoPesoLite(precio)}</p>
             <div class="flex items-center gap-2 mt-1.5">
-              <button type="button" onclick="cambiarCantidad('${idAttr.replace(/'/g, '')}', -1)" class="w-6 h-6 rounded border text-xs">−</button>
-              <span class="text-xs font-bold">${esc(item.cantidad)}</span>
-              <button type="button" onclick="cambiarCantidad('${idAttr.replace(/'/g, '')}', 1)" class="w-6 h-6 rounded border text-xs">+</button>
+              <button type="button" onclick="cambiarCantidad('${idAttr.replace(/'/g, '')}', -1)" class="et-btn-icon et-press w-6 h-6 rounded border text-xs hover:bg-gray-100">−</button>
+              <span class="text-xs font-bold et-qty-value">${esc(item.cantidad)}</span>
+              <button type="button" onclick="cambiarCantidad('${idAttr.replace(/'/g, '')}', 1)" class="et-btn-icon et-press w-6 h-6 rounded border text-xs hover:bg-gray-100">+</button>
             </div>
           </div>
         </div>`;

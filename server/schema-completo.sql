@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS public.productos (
   exclusivo     boolean NOT NULL DEFAULT false,
   es_destacado  boolean NOT NULL DEFAULT false,
   en_oferta     boolean NOT NULL DEFAULT false,
+  envio_gratis  boolean NOT NULL DEFAULT true,
   created_at    timestamptz NOT NULL DEFAULT now()
 );
 
@@ -27,6 +28,8 @@ ALTER TABLE public.productos
   ADD COLUMN IF NOT EXISTS es_destacado boolean NOT NULL DEFAULT false;
 ALTER TABLE public.productos
   ADD COLUMN IF NOT EXISTS en_oferta boolean NOT NULL DEFAULT false;
+ALTER TABLE public.productos
+  ADD COLUMN IF NOT EXISTS envio_gratis boolean NOT NULL DEFAULT true;
 
 UPDATE public.productos SET stock = 0 WHERE stock < 0;
 ALTER TABLE public.productos

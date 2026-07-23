@@ -211,7 +211,7 @@ function setStepper(paso) {
     const label = document.getElementById(`step-label-${i}`);
     if (!num || !label) continue;
     if (i <= paso) {
-      num.className = 'w-6 h-6 rounded-full bg-black text-white flex items-center justify-center';
+      num.className = 'w-6 h-6 rounded-full bg-[#4A5D3F] text-white flex items-center justify-center';
       label.className = 'text-black font-black';
     } else {
       num.className = 'w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center text-gray-400';
@@ -268,7 +268,7 @@ function irAlPaso(paso) {
     contenido2?.classList.remove('hidden');
     markEnter(contenido2);
     if (paso2Badge) {
-      paso2Badge.className = 'w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center et-state-flash';
+      paso2Badge.className = 'w-6 h-6 rounded-full bg-[#4A5D3F] text-white text-xs font-bold flex items-center justify-center et-state-flash';
       paso2Badge.innerText = '2';
     }
     if (paso2Titulo) paso2Titulo.className = 'font-extrabold text-sm tracking-wider uppercase text-gray-900';
@@ -276,7 +276,7 @@ function irAlPaso(paso) {
     bloque2?.classList.remove('opacity-50', 'pointer-events-none');
     contenido2?.classList.add('hidden');
     if (paso2Badge) {
-      paso2Badge.className = 'w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center';
+      paso2Badge.className = 'w-6 h-6 rounded-full bg-[#4A5D3F] text-white text-xs font-bold flex items-center justify-center';
     }
     if (paso2Titulo) paso2Titulo.className = 'font-extrabold text-sm tracking-wider uppercase text-gray-900';
   } else {
@@ -293,7 +293,7 @@ function irAlPaso(paso) {
     contenido3?.classList.remove('hidden');
     markEnter(contenido3);
     if (paso3Badge) {
-      paso3Badge.className = 'w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center et-state-flash';
+      paso3Badge.className = 'w-6 h-6 rounded-full bg-[#4A5D3F] text-white text-xs font-bold flex items-center justify-center et-state-flash';
     }
     if (paso3Titulo) paso3Titulo.className = 'font-extrabold text-sm tracking-wider uppercase text-gray-900';
     actualizarConfirmacion();

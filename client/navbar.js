@@ -12,85 +12,76 @@
     { slug: 'regalos-empresariales', href: 'regalos-empresariales.html', label: 'Regalos' }
   ];
 
-  const LINK_BASE = 'hover:text-black transition py-1';
-  const LINK_ACTIVO =
-    'border-2 border-[#3D5239] bg-[#3D5239]/5 rounded px-3 py-1 text-[#3D5239]';
-  const MOBILE_BASE = 'block py-2 px-3 rounded hover:bg-gray-50';
-  const MOBILE_ACTIVO =
-    'block py-2 px-3 rounded bg-[#3D5239]/10 text-[#3D5239] font-extrabold';
-
   function slugActual() {
     // Detecta el archivo actual (ej: "camioneros.html" → "camioneros")
     const archivo = (window.location.pathname.split('/').pop() || 'index.html').replace('.html', '');
     return !archivo || archivo === 'index' ? 'index' : archivo;
   }
 
-  function renderNavLinks(activo, variante) {
-    return NAV_ITEMS.map((item) => {
+  function renderNavLinks(activo) {
+    return NAV_ITEMS.map((item, i) => {
       const isActivo = item.slug === activo;
-      if (variante === 'mobile') {
-        return `<a href="${item.href}" class="${isActivo ? MOBILE_ACTIVO : MOBILE_BASE}">${item.label}</a>`;
-      }
-      return `<a href="${item.href}" class="${isActivo ? LINK_ACTIVO : LINK_BASE}">${item.label}</a>`;
+      return `<a href="${item.href}" class="et-drawer-link${isActivo ? ' is-active' : ''}" style="--i:${i}">${item.label}</a>`;
     }).join('\n        ');
   }
 
   function htmlNavbar() {
     const activo = slugActual();
     return `
-<!-- BARRA DE NAVEGACIÓN LIMPIA Y OPTIMIZADA -->
-<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-6">
+<!-- BARRA DE NAVEGACIÓN — logo centrado + menú lateral de categorías -->
+<header class="et-site-header bg-white/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100/80 shadow-[0_1px_0_rgba(61,82,57,0.06)]">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 py-1.5 flex items-center justify-between gap-2 min-h-[3.25rem]">
 
-    <!-- 1. LOGO -->
-    <a href="index.html" class="flex items-center shrink-0 group" aria-label="El Taller Distribuidora">
-      <img src="eltaller.png" alt="El Taller Distribuidora"
-           class="h-16 w-16 md:h-20 md:w-20 object-contain group-hover:scale-105 transition-transform duration-300">
-    </a>
+    <!-- 1. HAMBURGUESA (abre categorías) -->
+    <div class="flex items-center shrink-0 w-10 sm:w-24">
+      <button type="button" id="btn-menu-categorias" onclick="toggleMenuMobile()"
+        class="et-btn-icon et-press w-10 h-10 p-0 rounded-lg text-[#3D5239] hover:bg-[#3D5239]/10 transition flex items-center justify-center"
+        aria-label="Abrir categorías" aria-expanded="false" aria-controls="menu-categorias-drawer">
+        <i class="fa-solid fa-bars text-base" id="icon-menu-categorias"></i>
+      </button>
+    </div>
 
-    <!-- 2. LINKS DE CATEGORÍAS (Escritorio) -->
-    <nav class="hidden xl:flex items-center gap-6 text-[11px] font-black uppercase tracking-widest text-gray-700">
-      ${renderNavLinks(activo, 'desktop')}
-    </nav>
+    <!-- 2. LOGO CENTRADO (wordmark) -->
+    <a href="index.html"
+       class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 et-wordmark et-wordmark--md"
+       aria-label="El Taller Distribuidora">El taller Distribuidora</a>
 
-    <!-- 3. ACCESORIOS DERECHA: Buscador, Carrito, Usuario / Admin -->
-    <div class="flex items-center gap-3">
+    <!-- 3. ACCIONES DERECHA -->
+    <div class="flex items-center gap-1.5 sm:gap-2 ml-auto">
 
       <!-- BARRA DE BÚSQUEDA -->
-      <div class="relative hidden md:block w-40 lg:w-52">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+      <div class="relative hidden md:block w-32 lg:w-40">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-gray-400">
+          <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
         </span>
         <input type="text" id="input-busqueda" oninput="buscarProductosHeader(this.value)" placeholder="Buscar..."
-          class="w-full bg-gray-50 border border-gray-200 rounded-full pl-9 pr-3 py-1.5 text-xs font-semibold text-gray-800 focus:bg-white focus:border-[#3D5239] outline-none transition shadow-inner">
+          class="w-full bg-gray-50 border border-gray-200 rounded-full pl-8 pr-2.5 py-1.5 text-[11px] font-semibold text-gray-800 focus:bg-white focus:border-[#3D5239] outline-none transition">
       </div>
 
-      <!-- BOTÓN PANEL ADMIN (Solo visible si sos admin) -->
+      <!-- BOTÓN PANEL ADMIN (solo ícono) -->
       <div id="link-admin-header" class="hidden">
-        <a href="admin.html" class="bg-[#3D5239] text-white rounded-full text-xs hover:bg-[#2c3d29] transition shadow-sm flex items-center justify-center w-11 h-11" title="Panel de Administración">
+        <a href="admin.html" class="et-btn-icon et-press bg-[#3D5239] text-white rounded-full hover:bg-[#2c3d29] transition flex items-center justify-center w-10 h-10" title="Panel de Administración" aria-label="Panel de Administración">
           <i class="fa-solid fa-gauge-high text-xs"></i>
         </a>
       </div>
 
       <!-- BOTÓN USUARIO / LOGIN -->
-      <button type="button" id="btn-iniciar-sesion" onclick="abrirModalAuth()" class="flex items-center justify-center gap-2 w-11 h-11 sm:w-auto sm:h-auto sm:px-3 sm:py-1.5 rounded-full hover:bg-gray-100 transition text-gray-700 text-xs font-black uppercase tracking-wider">
+      <button type="button" id="btn-iniciar-sesion" onclick="abrirModalAuth()" class="et-btn-soft et-press flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition text-gray-700" aria-label="Iniciar sesión" title="Iniciar sesión">
         <i class="fa-solid fa-user text-sm"></i>
-        <span class="hidden sm:inline">Iniciar sesión</span>
       </button>
 
-      <!-- MENÚ CUENTA (cliente o admin) -->
+      <!-- MENÚ CUENTA (cliente o admin) — ícono en barra; nombre en dropdown -->
       <div id="menu-cuenta-wrap" class="relative hidden">
         <button type="button" id="btn-menu-cuenta" onclick="toggleMenuCuenta(event)"
-          class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition text-gray-700 text-xs font-black uppercase tracking-wider"
-          aria-expanded="false" aria-haspopup="true">
+          class="et-btn-soft et-press flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition text-gray-700"
+          aria-expanded="false" aria-haspopup="true" aria-label="Mi cuenta">
           <i class="fa-solid fa-user text-sm"></i>
-          <span class="hidden sm:inline max-w-[140px] truncate" id="btn-menu-cuenta-label">Mi cuenta</span>
-          <i class="fa-solid fa-chevron-down text-[9px] text-gray-400"></i>
+          <span class="sr-only" id="btn-menu-cuenta-label">Mi cuenta</span>
         </button>
 
-        <div id="dropdown-cuenta" class="et-nav-panel hidden absolute right-0 mt-2 w-64 bg-white shadow-lg border border-gray-100 z-[70] overflow-hidden">
+        <div id="dropdown-cuenta" class="et-nav-panel hidden absolute right-0 mt-2 w-64 bg-white shadow-lg border border-gray-100 z-[70] overflow-hidden rounded-xl">
           <div class="px-4 py-3 border-b border-gray-100">
-            <p id="cuenta-email" class="text-sm text-gray-500 truncate">—</p>
+            <p id="cuenta-email" class="text-sm font-semibold text-gray-800 truncate">—</p>
           </div>
           <nav id="nav-cuenta-cliente" class="py-1 text-sm text-gray-800">
             <a href="mi-cuenta.html" class="block px-4 py-2.5 hover:bg-gray-50 transition">Resumen</a>
@@ -106,49 +97,61 @@
         </div>
       </div>
 
-      <!-- BOTÓN CARRITO -->
-      <button onclick="abrirCarrito()" class="relative p-2 rounded-full hover:bg-gray-100 transition flex items-center justify-center w-11 h-11">
-        <svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-        </svg>
-        <span id="carrito-contador" class="absolute -top-1 -right-1 bg-[#3D5239] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+      <!-- BOTÓN CARRITO (badge fuera del botón: .et-btn-icon tiene overflow:hidden) -->
+      <div class="relative shrink-0">
+        <button type="button" onclick="abrirCarrito()" class="et-btn-icon et-press rounded-full hover:bg-gray-100 transition flex items-center justify-center w-10 h-10" aria-label="Carrito">
+          <svg class="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+          </svg>
+        </button>
+        <span id="carrito-contador" class="pointer-events-none absolute -top-0.5 -right-0.5 z-10 bg-[#3D5239] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm leading-none">
           0
         </span>
-      </button>
-
-      <!-- MENÚ MÓVIL (Hamburguesa) -->
-      <button onclick="toggleMenuMobile()" class="xl:hidden w-11 h-11 p-0 rounded-lg text-gray-700 hover:bg-gray-100 transition flex items-center justify-center">
-        <i class="fa-solid fa-bars text-base"></i>
-      </button>
+      </div>
 
     </div>
   </div>
-
-  <!-- MENÚ MÓVIL DESPLEGABLE (Categorías para celulares) -->
-  <div id="menu-mobile" class="et-nav-panel hidden xl:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-2 text-xs font-black uppercase tracking-widest text-gray-700">
-        ${renderNavLinks(activo, 'mobile')}
-        <button type="button" id="btn-iniciar-sesion-mobile" onclick="abrirModalAuth(); toggleMenuMobile();"
-          class="w-full text-left block py-2 px-3 rounded hover:bg-gray-50 border-t border-gray-100 mt-2 pt-3">
-          <i class="fa-solid fa-user mr-1.5"></i> Iniciar sesión
-        </button>
-        <div id="menu-cuenta-mobile" class="hidden border-t border-gray-100 mt-2 pt-3 space-y-1">
-          <p id="cuenta-email-mobile" class="px-3 py-1 text-[11px] text-gray-400 font-medium normal-case tracking-normal truncate">—</p>
-          <div id="nav-cuenta-cliente-mobile" class="space-y-1">
-            <a href="mi-cuenta.html" class="block py-2 px-3 rounded hover:bg-gray-50">Resumen</a>
-            <a href="mi-cuenta.html#perfil" class="block py-2 px-3 rounded hover:bg-gray-50">Mi perfil</a>
-            <a href="mi-cuenta.html#pedidos" class="block py-2 px-3 rounded hover:bg-gray-50">Mis pedidos</a>
-            <a href="mi-cuenta.html#configuracion" class="block py-2 px-3 rounded hover:bg-gray-50">Configuración</a>
-          </div>
-          <button type="button" onclick="cerrarSesionCliente(); toggleMenuMobile();"
-            class="w-full text-left block py-2 px-3 rounded hover:bg-red-50 text-[#8B2E2E] normal-case tracking-normal font-bold">
-            Cerrar sesión
-          </button>
-        </div>
-  </div>
 </header>
 
+<!-- MENÚ LATERAL DE CATEGORÍAS -->
+<div id="menu-categorias-drawer" class="et-nav-drawer fixed inset-0 z-[60] hidden" aria-hidden="true">
+  <div class="et-nav-drawer-backdrop absolute inset-0" onclick="cerrarMenuMobile()" aria-hidden="true"></div>
+  <nav id="menu-mobile"
+       class="et-nav-drawer-panel absolute left-0 top-0 h-full w-[72%] max-w-[300px] text-white flex flex-col"
+       aria-label="Categorías">
+    <div class="et-drawer-brand flex items-start justify-between gap-3 px-5 pt-7 pb-5">
+      <a href="index.html" class="et-wordmark et-wordmark--on-dark et-wordmark--sm et-drawer-wordmark min-w-0 flex-1" aria-label="El Taller Distribuidora">El taller Distribuidora</a>
+      <button type="button" onclick="cerrarMenuMobile()" class="et-drawer-close shrink-0" aria-label="Cerrar menú">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <p class="et-drawer-eyebrow px-5 pb-3">Categorías</p>
+    <div class="et-drawer-links flex-1 overflow-y-auto px-4 pb-6 flex flex-col gap-1">
+      ${renderNavLinks(activo)}
+    </div>
+    <div class="et-drawer-social px-5 py-5">
+      <div class="flex items-center justify-center gap-3">
+        <a href="https://wa.me/5492236872975" target="_blank" rel="noopener noreferrer"
+           class="et-drawer-social-btn" aria-label="WhatsApp">
+          <i class="fa-brands fa-whatsapp"></i>
+        </a>
+        <a href="https://www.instagram.com/eltaller.distribuidora/" target="_blank" rel="noopener noreferrer"
+           class="et-drawer-social-btn" aria-label="Instagram">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="#" class="et-drawer-social-btn" aria-label="Facebook">
+          <i class="fa-brands fa-facebook-f"></i>
+        </a>
+        <a href="#" class="et-drawer-social-btn" aria-label="TikTok">
+          <i class="fa-brands fa-tiktok"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+</div>
+
 <!-- MODAL DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
-  <div id="auth-modal" class="et-modal hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div id="auth-modal" class="et-modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
   <div class="et-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-100 overflow-hidden relative scale-95 opacity-0" onclick="event.stopPropagation()">
 
     <!-- Botón Cerrar (X) -->
@@ -160,8 +163,8 @@
 
       <!-- LOGO / ENCABEZADO -->
       <div class="text-center mb-6">
-        <img src="eltaller.png" alt="El Taller" class="w-16 h-16 mx-auto mb-2 object-contain">
-        <h2 id="auth-titulo" class="text-sm font-black text-gray-900 uppercase tracking-widest">Iniciar Sesión</h2>
+        <span class="et-wordmark et-wordmark--md block text-center" aria-hidden="true">El taller Distribuidora</span>
+        <h2 id="auth-titulo" class="text-sm font-black text-gray-900 uppercase tracking-widest mt-4">Iniciar Sesión</h2>
         <p id="auth-subtitulo" class="text-xs text-gray-500 font-medium mt-1">Accedé a tu cuenta en El Taller Distribuidora</p>
       </div>
 
@@ -214,7 +217,7 @@
 
         <!-- Botón de Envío -->
         <button type="submit" id="btn-auth-submit"
-          class="w-full bg-[#3D5239] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:bg-[#2c3d29] transition shadow-md active:scale-95 mt-2">
+          class="et-btn et-press w-full bg-[#3D5239] text-white rounded-xl py-3 text-xs font-black uppercase tracking-widest hover:bg-[#2c3d29] transition shadow-md mt-2">
           Ingresar
         </button>
 
@@ -268,19 +271,44 @@
     return supabaseLoadPromise;
   }
 
-  window.toggleMenuMobile = function toggleMenuMobile() {
-    const menu = document.getElementById('menu-mobile');
-    if (!menu) return;
-    const abriendo = menu.classList.contains('hidden') || !menu.classList.contains('is-open');
-    if (abriendo) {
-      menu.classList.remove('hidden');
+  function setMenuDrawerState(abierto) {
+    const drawer = document.getElementById('menu-categorias-drawer');
+    const btn = document.getElementById('btn-menu-categorias');
+    const icon = document.getElementById('icon-menu-categorias');
+    if (!drawer) return;
+
+    const dur = 480;
+
+    if (abierto) {
+      drawer.classList.remove('hidden');
+      drawer.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('overflow-hidden');
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => menu.classList.add('is-open'));
+        requestAnimationFrame(() => drawer.classList.add('is-open'));
       });
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+      if (icon) icon.className = 'fa-solid fa-xmark text-base';
     } else {
-      menu.classList.remove('is-open');
-      setTimeout(() => menu.classList.add('hidden'), (window.ElTallerMotion && window.ElTallerMotion.DUR) || 280);
+      drawer.classList.remove('is-open');
+      drawer.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('overflow-hidden');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+      if (icon) icon.className = 'fa-solid fa-bars text-base';
+      setTimeout(() => {
+        if (!drawer.classList.contains('is-open')) drawer.classList.add('hidden');
+      }, dur);
     }
+  }
+
+  window.cerrarMenuMobile = function cerrarMenuMobile() {
+    setMenuDrawerState(false);
+  };
+
+  window.toggleMenuMobile = function toggleMenuMobile() {
+    const drawer = document.getElementById('menu-categorias-drawer');
+    if (!drawer) return;
+    const abierto = drawer.classList.contains('is-open');
+    setMenuDrawerState(!abierto);
   };
 
   window.abrirCarrito = function abrirCarrito() {
@@ -309,9 +337,7 @@
 
   function mostrarBotonLogin(visible) {
     const btn = document.getElementById('btn-iniciar-sesion');
-    const btnMobile = document.getElementById('btn-iniciar-sesion-mobile');
     if (btn) btn.classList.toggle('hidden', !visible);
-    if (btnMobile) btnMobile.classList.toggle('hidden', !visible);
   }
 
   function nombreDesdeUsuario(user) {
@@ -322,19 +348,15 @@
 
   function mostrarMenuCuenta(visible, email, esAdmin, nombreCliente) {
     const wrap = document.getElementById('menu-cuenta-wrap');
-    const mobile = document.getElementById('menu-cuenta-mobile');
     const emailEl = document.getElementById('cuenta-email');
-    const emailMobile = document.getElementById('cuenta-email-mobile');
     const label = document.getElementById('btn-menu-cuenta-label');
+    const btnCuenta = document.getElementById('btn-menu-cuenta');
     const navCliente = document.getElementById('nav-cuenta-cliente');
-    const navClienteMobile = document.getElementById('nav-cuenta-cliente-mobile');
 
     if (wrap) wrap.classList.toggle('hidden', !visible);
-    if (mobile) mobile.classList.toggle('hidden', !visible);
 
     // Links de cliente (Resumen, etc.) solo para clientes
     if (navCliente) navCliente.classList.toggle('hidden', !!esAdmin);
-    if (navClienteMobile) navClienteMobile.classList.toggle('hidden', !!esAdmin);
 
     if (email || esAdmin || nombreCliente) {
       const nombreCuenta = esAdmin
@@ -342,13 +364,8 @@
         : (nombreCliente || email.split('@')[0] || 'Mi cuenta');
 
       if (emailEl) emailEl.innerText = esAdmin ? 'ELTALLERADMIN' : (email || nombreCuenta);
-      if (emailMobile) emailMobile.innerText = esAdmin ? 'ELTALLERADMIN' : (email || nombreCuenta);
-      if (label) {
-        const texto = nombreCuenta.toUpperCase();
-        label.innerText = texto.length > 18 && !esAdmin
-          ? texto.slice(0, 18) + '…'
-          : texto;
-      }
+      if (label) label.innerText = nombreCuenta;
+      if (btnCuenta) btnCuenta.setAttribute('aria-label', nombreCuenta);
     }
 
     if (!visible) {
@@ -649,6 +666,10 @@
       if (wrap && !wrap.contains(e.target)) {
         window.cerrarMenuCuenta();
       }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') window.cerrarMenuMobile();
     });
 
     // Crear / reutilizar cliente UNA sola vez, después actualizar UI

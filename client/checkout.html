@@ -27,9 +27,7 @@
     </a>
 
     <!-- LOGO -->
-    <a href="index.html" class="flex items-center gap-2">
-      <img src="eltaller.png" alt="El Taller Distribuidora" class="w-14 h-14 object-contain">
-    </a>
+    <a href="index.html" class="et-wordmark et-wordmark--md" aria-label="El Taller Distribuidora">El taller Distribuidora</a>
 
     <div class="flex items-center gap-1.5 text-gray-500 font-bold text-[11px]">
       <i class="fa-solid fa-lock text-xs text-green-700"></i> COMPRA SEGURA
@@ -41,7 +39,7 @@
     <!-- STEPPER (PASOS) -->
     <div class="flex items-center justify-center gap-4 mb-8 text-xs font-bold uppercase tracking-wider">
       <div class="flex items-center gap-2" id="step-indicator-1">
-        <span class="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center" id="step-num-1">1</span>
+        <span class="w-6 h-6 rounded-full bg-[#4A5D3F] text-white flex items-center justify-center" id="step-num-1">1</span>
         <span class="text-black font-black" id="step-label-1">Entrega</span>
       </div>
       <div class="w-12 h-[1px] bg-gray-300"></div>
@@ -71,7 +69,7 @@
         <div class="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm" id="bloque-paso-1">
           <div class="p-4 bg-gray-50/50 flex items-center justify-between border-b border-gray-100 cursor-pointer" onclick="irAlPaso(1)">
             <div class="flex items-center gap-3">
-              <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center">1</span>
+              <span class="w-6 h-6 rounded-full bg-[#4A5D3F] text-white text-xs font-bold flex items-center justify-center">1</span>
               <h2 class="font-extrabold text-sm tracking-wider uppercase text-gray-900">Datos de Entrega</h2>
             </div>
             <button type="button" id="btn-editar-entrega" class="text-xs font-bold underline text-gray-500 hover:text-black hidden">EDITAR</button>
@@ -111,18 +109,18 @@
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Dirección de entrega *</label>
                 <input type="text" id="cliente-direccion" required
-                  class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400"
+                  class="et-field w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400"
                   placeholder="Ej: Av. España 1234, Tandil">
               </div>
               <div>
                 <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">Notas (opcional)</label>
                 <textarea id="cliente-notas" rows="2"
-                  class="w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400 resize-none"
+                  class="et-field w-full border border-gray-200 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-gray-400 resize-none"
                   placeholder="Referencias, horario de entrega, etc."></textarea>
               </div>
               <div class="pt-2 flex justify-end">
                 <button type="submit"
-                  class="px-8 py-3 bg-black text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-gray-800 transition shadow-md">
+                  class="et-btn et-press px-8 py-3 bg-[#4A5D3F] text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-[#3C4C33] transition shadow-md">
                   Continuar a Pago
                 </button>
               </div>
@@ -133,7 +131,7 @@
         <!-- PASO 2: MÉTODO DE PAGO -->
         <div id="bloque-paso-2" class="bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm p-6 space-y-4 opacity-50 pointer-events-none">
           <div class="flex items-center gap-3">
-            <span class="w-6 h-6 rounded-full bg-black text-white text-xs font-bold flex items-center justify-center" id="paso2-badge">2</span>
+            <span class="w-6 h-6 rounded-full bg-[#4A5D3F] text-white text-xs font-bold flex items-center justify-center" id="paso2-badge">2</span>
             <h2 class="font-extrabold text-sm tracking-wider uppercase text-gray-900" id="paso2-titulo">Método de Pago</h2>
           </div>
 
@@ -169,10 +167,10 @@
 
             <!-- BOTONES DE NAVEGACIÓN -->
             <div class="pt-4 flex items-center justify-between">
-              <button type="button" onclick="irAlPaso(1)" class="px-6 py-3 border border-gray-300 rounded text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition">
+              <button type="button" onclick="irAlPaso(1)" class="et-btn-soft et-press px-6 py-3 border border-gray-300 rounded text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition">
                 Volver
               </button>
-              <button type="button" id="btn-continuar-whatsapp" onclick="completarPedidoYWhatsApp()" class="px-8 py-3 bg-black text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-gray-800 transition shadow-md flex items-center gap-2">
+              <button type="button" id="btn-continuar-whatsapp" onclick="completarPedidoYWhatsApp()" class="et-btn et-press px-8 py-3 bg-[#4A5D3F] text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-[#3C4C33] transition shadow-md flex items-center gap-2">
                 <i class="fa-brands fa-whatsapp text-base text-green-400"></i> CONTINUAR A CONFIRMACIÓN
               </button>
             </div>
@@ -214,10 +212,10 @@
             </div>
 
             <div class="pt-2 flex items-center justify-between">
-              <button type="button" onclick="irAlPaso(2)" class="px-6 py-3 border border-gray-300 rounded text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition">
+              <button type="button" onclick="irAlPaso(2)" class="et-btn-soft et-press px-6 py-3 border border-gray-300 rounded text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-100 transition">
                 Volver
               </button>
-              <button type="button" id="btn-confirmar-pedido" onclick="completarPedidoYWhatsApp()" class="px-8 py-3 bg-black text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-gray-800 transition shadow-md flex items-center gap-2">
+              <button type="button" id="btn-confirmar-pedido" onclick="completarPedidoYWhatsApp()" class="et-btn et-press px-8 py-3 bg-[#4A5D3F] text-white rounded text-xs font-extrabold uppercase tracking-wider hover:bg-[#3C4C33] transition shadow-md flex items-center gap-2">
                 <i class="fa-brands fa-whatsapp text-base text-green-400"></i> Confirmar Pedido
               </button>
             </div>
@@ -243,8 +241,8 @@
             <span class="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider block">CUPÓN DE DESCUENTO</span>
             <div class="flex gap-2">
               <input type="text" id="cupon-codigo" placeholder="CÓDIGO"
-                class="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-black uppercase">
-              <button type="button" onclick="aplicarCupon()" class="bg-black text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-gray-800 transition">
+                class="et-field w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-black uppercase">
+              <button type="button" onclick="aplicarCupon()" class="et-btn et-press bg-[#4A5D3F] text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-[#3C4C33] transition">
                 Aplicar
               </button>
             </div>

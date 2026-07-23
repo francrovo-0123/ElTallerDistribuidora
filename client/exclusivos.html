@@ -53,7 +53,7 @@
           <label class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Cupón de descuento</label>
           <div class="flex gap-2 mt-1.5">
             <input id="input-cupon" type="text" placeholder="Código" class="flex-1 border rounded-lg px-3 py-2 text-xs outline-none focus:border-taller">
-            <button onclick="validarYAplicarCupon()" class="bg-taller text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-taller-dark transition">Aplicar</button>
+            <button onclick="validarYAplicarCupon()" class="et-btn et-press bg-taller text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-taller-dark transition">Aplicar</button>
           </div>
           <p id="msg-cupon" class="text-[11px] mt-1.5 hidden"></p>
         </div>
@@ -62,7 +62,7 @@
           <div class="flex justify-between text-gray-600"><span>Descuento</span><span id="cart-descuento">-$0</span></div>
           <div class="flex justify-between font-bold text-gray-900 text-base pt-2 border-t"><span>Total</span><span id="cart-total">$0</span></div>
         </div>
-        <button onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
+        <button onclick="irAlCheckout()" class="et-btn et-press w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-xl transition">Finalizar compra</button>
       </div>
     </div>
   </div>
@@ -79,6 +79,7 @@
       filtro: 'exclusivos'
     };
   </script>
+  <script src="product-card.js"></script>
   <script src="categoria.js"></script>
 </body>
 </html>

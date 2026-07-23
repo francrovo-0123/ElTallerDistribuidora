@@ -12,6 +12,8 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" href="eltaller.png">
   <title>El Taller - Tienda Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="output.css">
   <!-- FontAwesome para los íconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,11 +22,12 @@
   <script src="security.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="motion.js"></script>
+  <script src="product-card.js"></script>
 </head>
-<body class="bg-taller-light font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-taller-light font-sans antialiased min-h-screen flex flex-col justify-between">
 
-  <!-- MARQUESINA INFINITA (DE IZQUIERDA A DERECHA) -->
-  <div id="container-marquee" class="bg-[#4A5D3F] text-white overflow-hidden py-2 text-xs font-semibold tracking-wider uppercase border-t border-b border-[#3C4C33] et-banner-attention">
+  <!-- MARQUESINA FINA SUPERIOR -->
+  <div id="container-marquee" class="et-marquee" role="status" aria-live="polite">
     <div id="marquee-content" class="animate-marquee-derecha whitespace-nowrap flex">
       <!-- Se llena automáticamente con el texto repetido por JavaScript -->
     </div>
@@ -48,54 +51,50 @@
   </section>
 
   <!-- CATÁLOGO DE PRODUCTOS -->
-  <main class="max-w-7xl mx-auto px-6 pt-6 pb-24 md:pt-8 md:pb-8 flex-grow w-full">
+  <main class="max-w-7xl mx-auto px-6 pt-10 pb-24 md:pt-14 md:pb-10 flex-grow w-full">
 
     <!-- CARRUSEL DESTACADOS -->
-    <section id="seccion-destacados" class="mb-10 md:mb-12 hidden" data-reveal>
-      <div class="flex items-center justify-between gap-4 mb-4">
-        <div>
-          <p class="text-[11px] font-bold uppercase tracking-widest text-taller mb-1 leading-none">Selección</p>
-          <h2 class="text-xl font-bold text-gray-800 leading-tight">Destacados</h2>
-        </div>
-        <div class="flex gap-2 shrink-0">
-          <button type="button" onclick="moverCarrusel('track-destacados', -1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-taller hover:text-white hover:border-taller transition flex items-center justify-center" aria-label="Anterior destacados">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-          </button>
-          <button type="button" onclick="moverCarrusel('track-destacados', 1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-taller hover:text-white hover:border-taller transition flex items-center justify-center" aria-label="Siguiente destacados">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
-        </div>
+    <section id="seccion-destacados" class="mb-12 md:mb-16 hidden" data-reveal>
+      <div class="mb-6">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-taller mb-1.5 leading-none">Selección</p>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 leading-tight">Destacados</h2>
       </div>
-      <div id="track-destacados" class="carrusel-track">
-        <!-- Dinámico -->
+      <div class="carrusel-wrap carrusel-wrap--destacados">
+        <button type="button" onclick="moverCarrusel('track-destacados', -1)" class="carrusel-nav carrusel-nav--prev" aria-label="Anterior destacados">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div id="track-destacados" class="carrusel-track">
+          <!-- Dinámico -->
+        </div>
+        <button type="button" onclick="moverCarrusel('track-destacados', 1)" class="carrusel-nav carrusel-nav--next" aria-label="Siguiente destacados">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 
     <!-- CARRUSEL OFERTAS -->
-    <section id="seccion-ofertas" class="mb-10 md:mb-12 hidden" data-reveal>
-      <div class="flex items-center justify-between gap-4 mb-4">
-        <div>
-          <p class="text-[11px] font-bold uppercase tracking-widest text-[#C4A484] mb-1 leading-none">Promo</p>
-          <h2 class="text-xl font-bold text-gray-800 leading-tight">En Oferta</h2>
-        </div>
-        <div class="flex gap-2 shrink-0">
-          <button type="button" onclick="moverCarrusel('track-ofertas', -1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-[#C4A484] hover:text-white hover:border-[#C4A484] transition flex items-center justify-center" aria-label="Anterior ofertas">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-          </button>
-          <button type="button" onclick="moverCarrusel('track-ofertas', 1)" class="w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-[#C4A484] hover:text-white hover:border-[#C4A484] transition flex items-center justify-center" aria-label="Siguiente ofertas">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
-        </div>
+    <section id="seccion-ofertas" class="mb-12 md:mb-16 hidden" data-reveal>
+      <div class="mb-6">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#C4A484] mb-1.5 leading-none">Promo</p>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800 leading-tight">En Oferta</h2>
       </div>
-      <div id="track-ofertas" class="carrusel-track">
-        <!-- Dinámico -->
+      <div class="carrusel-wrap carrusel-wrap--ofertas">
+        <button type="button" onclick="moverCarrusel('track-ofertas', -1)" class="carrusel-nav carrusel-nav--prev" aria-label="Anterior ofertas">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div id="track-ofertas" class="carrusel-track">
+          <!-- Dinámico -->
+        </div>
+        <button type="button" onclick="moverCarrusel('track-ofertas', 1)" class="carrusel-nav carrusel-nav--next" aria-label="Siguiente ofertas">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 
     <h2 class="text-xl font-bold mb-6 text-gray-800" data-reveal>Catálogo de Productos</h2>
     
-    <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" data-reveal>
-      <p class="text-gray-500 col-span-full text-center py-12">Cargando catálogo...</p>
+    <div id="grid-productos" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5" data-reveal aria-busy="true">
+      <!-- Skeletons inyectados al boot -->
     </div>
   </main>
 
@@ -119,7 +118,7 @@
           <label class="block text-xs font-semibold text-gray-600 mb-1">¿Tenés un cupón de descuento?</label>
           <div class="flex gap-2">
             <input type="text" id="input-cupon" placeholder="Ej: VERANO2026" class="w-full border rounded-lg px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:ring-2 focus:ring-taller">
-            <button type="button" onclick="validarYAplicarCupon()" class="bg-taller hover:bg-taller-dark text-white font-bold text-xs px-3 py-2 rounded-lg transition whitespace-nowrap">
+            <button type="button" onclick="validarYAplicarCupon()" class="et-btn et-press bg-taller hover:bg-taller-dark text-white font-bold text-xs px-3 py-2 rounded-lg transition whitespace-nowrap">
               Aplicar
             </button>
           </div>
@@ -142,7 +141,7 @@
           </div>
         </div>
 
-        <button type="button" id="btn-comprar" onclick="irAlCheckout()" class="w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg shadow transition flex items-center justify-center gap-2 mt-4">
+        <button type="button" id="btn-comprar" onclick="irAlCheckout()" class="et-btn et-press w-full bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg shadow transition flex items-center justify-center gap-2 mt-4">
           Ir al Checkout
         </button>
       </div>
@@ -203,6 +202,20 @@
 
     // Carruseles de Home: Destacados y Ofertas
     async function cargarCarruselesPortada() {
+      const skelDest = document.getElementById('track-destacados');
+      const skelOfertas = document.getElementById('track-ofertas');
+      const secDest = document.getElementById('seccion-destacados');
+      const secOfertas = document.getElementById('seccion-ofertas');
+      const M = window.ElTallerMotion;
+      if (M && skelDest && secDest) {
+        secDest.classList.remove('hidden');
+        M.showSkeletons(skelDest, M.renderProductSkeletons(4, { variant: 'destacado' }));
+      }
+      if (M && skelOfertas && secOfertas) {
+        secOfertas.classList.remove('hidden');
+        M.showSkeletons(skelOfertas, M.renderProductSkeletons(4, { variant: 'oferta' }));
+      }
+
       const { data, error } = await db
         .from('productos')
         .select('*')
@@ -211,6 +224,8 @@
 
       if (error) {
         console.error('Error al cargar carruseles de portada:', error);
+        if (secDest) secDest.classList.add('hidden');
+        if (secOfertas) secOfertas.classList.add('hidden');
         return;
       }
 
@@ -237,55 +252,66 @@
 
       seccion.classList.remove('hidden');
       track.innerHTML = lista.map(p => tarjetaCarrusel(p, tipo)).join('');
-      if (window.ElTallerMotion) window.ElTallerMotion.initScrollReveal();
+      if (window.ElTallerMotion) window.ElTallerMotion.clearBusy(track);
+      track.classList.remove('is-animated');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => track.classList.add('is-animated'));
+      });
+      if (window.ElTallerMotion) {
+        window.ElTallerMotion.initScrollReveal();
+        if (window.ElTallerMotion.staggerChildren) {
+          window.ElTallerMotion.staggerChildren(track, '.carrusel-card');
+        }
+        window.ElTallerMotion.enhanceButtons(track);
+        window.ElTallerMotion.bindImageFades(track);
+      }
+      actualizarFlechasCarrusel(trackId);
     }
 
     function tarjetaCarrusel(p, tipo) {
-      const badge = tipo === 'oferta'
-        ? '<span class="absolute top-3 left-3 bg-[#C4A484] text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Oferta</span>'
-        : '<span class="absolute top-3 left-3 bg-taller text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Destacado</span>';
+      const variant = tipo === 'destacado' ? 'destacado' : tipo === 'oferta' ? 'oferta' : 'carrusel';
+      if (typeof renderProductCard === 'function') {
+        const extra = tipo === 'destacado' ? 'carrusel-card carrusel-card--destacado' : 'carrusel-card';
+        return renderProductCard(p, { variant, extraClass: extra });
+      }
+      return '';
+    }
 
-      return `
-        <article class="carrusel-card et-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-          <a href="producto.html?id=${p.id}" class="relative block overflow-hidden">
-            <img src="${p.img || 'https://via.placeholder.com/300'}" alt="${p.titulo}" class="w-full h-40 object-cover">
-            ${badge}
-          </a>
-          <div class="p-4 flex flex-col flex-grow justify-between gap-3">
-            <div>
-              <h3 class="font-bold text-gray-800 text-sm leading-snug line-clamp-2">
-                <a href="producto.html?id=${p.id}" class="hover:text-taller-dark transition">${p.titulo}</a>
-              </h3>
-              <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wide">${p.categoria || ''}</p>
-            </div>
-            <div>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-base font-bold text-taller-dark">$${Number(p.precio).toLocaleString('es-AR')}</span>
-                <span class="${p.stock > 0
-                  ? 'bg-taller-light text-taller-dark border border-taller-accent/30'
-                  : 'bg-red-50 text-red-700 border border-red-200'} text-[10px] font-bold px-2 py-0.5 rounded">
-                  ${p.stock > 0 ? `Stock: ${p.stock}` : 'Agotado'}
-                </span>
-              </div>
-              <button
-                type="button"
-                onclick="agregarAlCarrito(${p.id})"
-                ${p.stock <= 0 ? 'disabled' : ''}
-                class="et-press w-full min-h-[44px] bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg text-[11px] flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-taller disabled:hover:bg-gray-300">
-                <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar' : 'Sin Stock'}
-              </button>
-            </div>
-          </div>
-        </article>
-      `;
+    function actualizarFlechasCarrusel(trackId) {
+      const track = document.getElementById(trackId);
+      if (!track) return;
+      const wrap = track.closest('.carrusel-wrap');
+      if (!wrap) return;
+      const prev = wrap.querySelector('.carrusel-nav--prev');
+      const next = wrap.querySelector('.carrusel-nav--next');
+      const max = track.scrollWidth - track.clientWidth - 2;
+      const atStart = track.scrollLeft <= 2;
+      const atEnd = track.scrollLeft >= max;
+      if (prev) {
+        prev.disabled = atStart;
+        prev.classList.toggle('is-disabled', atStart);
+      }
+      if (next) {
+        next.disabled = atEnd;
+        next.classList.toggle('is-disabled', atEnd);
+      }
     }
 
     function moverCarrusel(trackId, direccion) {
       const track = document.getElementById(trackId);
       if (!track) return;
+      const wrap = track.closest('.carrusel-wrap');
       const card = track.querySelector('.carrusel-card');
       const paso = card ? card.offsetWidth + 16 : 220;
+      track.classList.add(direccion > 0 ? 'is-sliding-next' : 'is-sliding-prev');
+      if (wrap) wrap.classList.add('is-moving');
       track.scrollBy({ left: direccion * paso, behavior: 'smooth' });
+      window.clearTimeout(track._carruselAnimTimer);
+      track._carruselAnimTimer = window.setTimeout(() => {
+        track.classList.remove('is-sliding-next', 'is-sliding-prev');
+        if (wrap) wrap.classList.remove('is-moving');
+        actualizarFlechasCarrusel(trackId);
+      }, 420);
     }
 
     const CAT_LINK_BASE = 'cat-link hover:text-black transition py-1 px-2';
@@ -357,52 +383,22 @@
             ? 'No hay productos en esta categoría.'
             : 'No hay productos disponibles por el momento.'
         }</p>`;
+        if (window.ElTallerMotion) window.ElTallerMotion.clearBusy(container);
         return;
       }
 
-      container.innerHTML = productos.map(p => {
-        const esc = window.escapeHtml || ((v) => String(v ?? ''));
-        const img = window.safeUrl
-          ? window.safeUrl(p.img, 'https://via.placeholder.com/300')
-          : (p.img || 'https://via.placeholder.com/300');
-        const idNum = Number(p.id);
-        return `
-        <div class="et-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
-          <a href="producto.html?id=${idNum}" class="relative block overflow-hidden">
-            <img src="${esc(img)}" alt="${esc(p.titulo)}" class="w-full h-48 object-cover">
-            ${p.exclusivo ? '<span class="absolute top-3 left-3 bg-taller text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded">Exclusivo</span>' : ''}
-          </a>
-          <div class="p-4 flex flex-col flex-grow justify-between">
-            <div>
-              <h3 class="font-bold text-gray-800 text-lg mb-1">
-                <a href="producto.html?id=${idNum}" class="hover:text-taller-dark transition">${esc(p.titulo)}</a>
-              </h3>
-              <p class="text-xs text-gray-500 mb-3">${esc(p.categoria || '')}</p>
-            </div>
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-xl font-bold text-taller-dark">$${Number(p.precio).toLocaleString()}</span>
-                <span class="${p.stock > 0
-                  ? 'bg-taller-light text-taller-dark border border-taller-accent/30'
-                  : 'bg-red-50 text-red-700 border border-red-200'} text-[10px] font-bold px-2 py-0.5 rounded">
-                  ${p.stock > 0 ? `Stock: ${Number(p.stock)}` : 'Agotado'}
-                </span>
-              </div>
-              <button
-                onclick="agregarAlCarrito(${idNum})"
-                ${p.stock <= 0 ? 'disabled' : ''}
-                class="et-press w-full min-h-[44px] bg-taller hover:bg-taller-dark text-white font-bold py-3 rounded-lg text-xs flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300">
-                <i class="fa-solid fa-cart-plus"></i> ${p.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      }).join('');
+      container.innerHTML = productos.map(p =>
+        typeof renderProductCard === 'function'
+          ? renderProductCard(p, { variant: 'grid' })
+          : ''
+      ).join('');
 
       if (window.ElTallerMotion) {
-        window.ElTallerMotion.staggerChildren(container, '.et-card');
+        window.ElTallerMotion.clearBusy(container);
+        window.ElTallerMotion.staggerChildren(container, '.et-product-card');
         window.ElTallerMotion.initScrollReveal();
+        window.ElTallerMotion.enhanceButtons(container);
+        window.ElTallerMotion.bindImageFades(container);
       }
     }
 
@@ -629,11 +625,6 @@
       document.getElementById('modal-carrito').classList.toggle('hidden');
     }
 
-    function toggleMenuMobile() {
-      const menu = document.getElementById('menu-mobile');
-      menu.classList.toggle('hidden');
-    }
-
     // Cargar y repetir el texto de la marquesina desde Supabase
     async function cargarMarquesina() {
       const contenedor = document.getElementById('marquee-content');
@@ -663,45 +654,97 @@
         console.log('Cargando texto predeterminado en la marquesina...');
       }
 
-      // Plantilla repetida 3 veces por bloque para asegurar que cubra pantallas anchas
+      // Plantilla repetida para cubrir pantallas anchas sin saltos
       const renderBloque = () => `
-        <div class="flex gap-8 items-center shrink-0 pr-8">
-          <span>${textoAnuncio}</span> <span>•</span>
-          <span>${textoAnuncio}</span> <span>•</span>
-          <span>${textoAnuncio}</span> <span>•</span>
+        <div class="marquee-half">
+          <span>${textoAnuncio}</span><span class="et-marquee-sep" aria-hidden="true">•</span>
+          <span>${textoAnuncio}</span><span class="et-marquee-sep" aria-hidden="true">•</span>
+          <span>${textoAnuncio}</span><span class="et-marquee-sep" aria-hidden="true">•</span>
         </div>
       `;
 
-      // Duplicamos el bloque para que el bucle continuo no tenga saltos visuales
       contenedor.innerHTML = renderBloque() + renderBloque();
     }
 
-    // --- Carrusel de banners ---
+    // --- Carrusel de banners (ciclo simple, siempre a la derecha) ---
     const BANNERS = [
       {
-        src: 'img/banners/banner-mayorista.png',
-        alt: 'El Taller Mayorista — Mínimo 15 unidades, envíos a todo el país'
+        src: 'img/banners/banner-mates.jpg',
+        alt: 'Mates artesanales El Taller Distribuidora'
       },
       {
-        src: 'img/banners/banner-mates-taller.png',
-        alt: 'Mates artesanales El Taller — selección de camioneros y torpedos'
+        src: 'img/banners/banner-bombillas.jpg',
+        alt: 'Bombillas y mates de calidad mayorista'
       },
       {
-        src: 'img/banners/banner-bombillas-mates.png',
-        alt: 'Mates y bombillas El Taller — calidad mayorista'
+        src: 'img/banners/banner-termos.jpg',
+        alt: 'Termos y accesorios para el mate'
       }
     ];
 
-    let bannerIndex = 0; // posición en el track (incluye clones)
+    let bannerIndex = 0;
     let bannerTimer = null;
-    let bannerAnimando = false;
 
     function slideBannerHTML(b) {
       return `
         <div class="banner-slide">
-          <img src="${b.src}" alt="${b.alt}" loading="eager">
+          <img src="${b.src}" alt="${b.alt}" loading="eager" decoding="async">
         </div>
       `;
+    }
+
+    function anchoSlideBanner() {
+      const carousel = document.getElementById('banner-carousel');
+      return carousel ? carousel.offsetWidth : 0;
+    }
+
+    function aplicarPosicionBanner(conAnimacion) {
+      const track = document.getElementById('banner-track');
+      if (!track) return;
+
+      if (conAnimacion === false) track.classList.add('sin-animacion');
+      else track.classList.remove('sin-animacion');
+
+      const w = anchoSlideBanner();
+      track.style.transform = w > 0
+        ? `translate3d(-${bannerIndex * w}px, 0, 0)`
+        : `translate3d(-${bannerIndex * 100}%, 0, 0)`;
+
+      const dots = document.getElementById('banner-dots');
+      if (dots) {
+        dots.querySelectorAll('.banner-dot').forEach((dot, i) => {
+          dot.classList.toggle('activo', i === bannerIndex);
+        });
+      }
+
+      if (conAnimacion === false) {
+        void track.offsetHeight;
+        track.classList.remove('sin-animacion');
+      }
+    }
+
+    function irAlSiguienteBanner() {
+      if (BANNERS.length < 2) return;
+      const esUltimo = bannerIndex >= BANNERS.length - 1;
+      if (esUltimo) {
+        // Vuelve al primero sin animación (evita pantalla verde / índice fuera de rango)
+        bannerIndex = 0;
+        aplicarPosicionBanner(false);
+      } else {
+        bannerIndex += 1;
+        aplicarPosicionBanner(true);
+      }
+    }
+
+    function irAlAnteriorBanner() {
+      if (BANNERS.length < 2) return;
+      if (bannerIndex <= 0) {
+        bannerIndex = BANNERS.length - 1;
+        aplicarPosicionBanner(false);
+      } else {
+        bannerIndex -= 1;
+        aplicarPosicionBanner(true);
+      }
     }
 
     function initBannerCarousel() {
@@ -715,32 +758,16 @@
         return;
       }
 
-      // Track infinito: [último clon] + reales + [primer clon]
-      // Así el deslizamiento siempre sigue hacia un lado, sin “rebobinar”
-      if (BANNERS.length >= 2) {
-        const primero = BANNERS[0];
-        const ultimo = BANNERS[BANNERS.length - 1];
-        track.innerHTML =
-          slideBannerHTML(ultimo) +
-          BANNERS.map(slideBannerHTML).join('') +
-          slideBannerHTML(primero);
-        bannerIndex = 1; // primer slide real
-      } else {
-        track.innerHTML = BANNERS.map(slideBannerHTML).join('');
-        bannerIndex = 0;
-      }
+      track.innerHTML = BANNERS.map(slideBannerHTML).join('');
+      bannerIndex = 0;
 
       dots.innerHTML = BANNERS.map((_, i) => `
         <button type="button" class="banner-dot ${i === 0 ? 'activo' : ''}" onclick="irABanner(${i})" aria-label="Ir al banner ${i + 1}"></button>
       `).join('');
 
-      track.classList.add('sin-animacion');
-      track.style.transform = `translateX(-${bannerIndex * 100}%)`;
-      // Forzar reflow y reactivar transición
-      void track.offsetHeight;
-      track.classList.remove('sin-animacion');
+      aplicarPosicionBanner(false);
 
-      track.addEventListener('transitionend', onBannerTransitionEnd);
+      window.addEventListener('resize', () => aplicarPosicionBanner(false));
 
       if (BANNERS.length < 2) {
         carousel.querySelectorAll('.banner-btn').forEach(btn => btn.classList.add('hidden'));
@@ -749,85 +776,28 @@
       }
 
       iniciarAutoBanner();
-      carousel.addEventListener('mouseenter', detenerAutoBanner);
-      carousel.addEventListener('mouseleave', iniciarAutoBanner);
-    }
-
-    function indiceRealBanner() {
-      if (BANNERS.length < 2) return 0;
-      // track: [clon último][0][1]...[n-1][clon primero]
-      let real = bannerIndex - 1;
-      if (bannerIndex === 0) real = BANNERS.length - 1;
-      if (bannerIndex === BANNERS.length + 1) real = 0;
-      return real;
-    }
-
-    function actualizarDotsBanner() {
-      const dots = document.getElementById('banner-dots');
-      if (!dots) return;
-      const real = indiceRealBanner();
-      dots.querySelectorAll('.banner-dot').forEach((dot, i) => {
-        dot.classList.toggle('activo', i === real);
-      });
-    }
-
-    function actualizarBanner(conAnimacion = true) {
-      const track = document.getElementById('banner-track');
-      if (!track) return;
-
-      if (!conAnimacion) track.classList.add('sin-animacion');
-      else track.classList.remove('sin-animacion');
-
-      track.style.transform = `translateX(-${bannerIndex * 100}%)`;
-      actualizarDotsBanner();
-
-      if (!conAnimacion) {
-        void track.offsetHeight;
-        track.classList.remove('sin-animacion');
-      }
-    }
-
-    function onBannerTransitionEnd(e) {
-      if (e.propertyName !== 'transform') return;
-      if (BANNERS.length < 2) return;
-
-      const track = document.getElementById('banner-track');
-      if (!track) return;
-
-      // Si llegamos al clon del primero (al final), saltamos al primero real sin animación
-      if (bannerIndex === BANNERS.length + 1) {
-        bannerIndex = 1;
-        actualizarBanner(false);
-      }
-      // Si llegamos al clon del último (al inicio), saltamos al último real
-      if (bannerIndex === 0) {
-        bannerIndex = BANNERS.length;
-        actualizarBanner(false);
-      }
-
-      bannerAnimando = false;
     }
 
     function moverBanner(dir) {
-      if (BANNERS.length < 2 || bannerAnimando) return;
-      bannerAnimando = true;
-      bannerIndex += dir;
-      actualizarBanner(true);
+      if (dir > 0) irAlSiguienteBanner();
+      else irAlAnteriorBanner();
       reiniciarAutoBanner();
     }
 
     function irABanner(i) {
-      if (BANNERS.length < 2 || bannerAnimando) return;
-      bannerAnimando = true;
-      bannerIndex = i + 1; // +1 por el clon al inicio
-      actualizarBanner(true);
+      if (i < 0 || i >= BANNERS.length || i === bannerIndex) return;
+      bannerIndex = i;
+      aplicarPosicionBanner(true);
       reiniciarAutoBanner();
     }
+
+    window.moverBanner = moverBanner;
+    window.irABanner = irABanner;
 
     function iniciarAutoBanner() {
       if (BANNERS.length < 2) return;
       detenerAutoBanner();
-      bannerTimer = setInterval(() => moverBanner(1), 5000);
+      bannerTimer = setInterval(irAlSiguienteBanner, 5000);
     }
 
     function detenerAutoBanner() {
@@ -844,6 +814,14 @@
 
     // INVOCACIÓN OBLIGATORIA AL CARGAR LA PÁGINA
     document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('grid-productos');
+      if (grid && window.ElTallerMotion) {
+        window.ElTallerMotion.showSkeletons(
+          grid,
+          window.ElTallerMotion.renderProductSkeletons(10)
+        );
+      }
+
       cargarCarritoLocal();
       actualizarCarrito();
       cargarMarquesina();
@@ -851,7 +829,15 @@
       initBannerCarousel();
       cargarCarruselesPortada();
       cargarProductos();
+
+      ['track-destacados', 'track-ofertas'].forEach((id) => {
+        const track = document.getElementById(id);
+        if (!track) return;
+        track.addEventListener('scroll', () => actualizarFlechasCarrusel(id), { passive: true });
+      });
     });
+
+    window.moverCarrusel = moverCarrusel;
   </script>
 </body>
 </html>

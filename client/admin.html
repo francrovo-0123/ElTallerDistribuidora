@@ -15,6 +15,7 @@
   <script src="supabase-config.js"></script>
   <script src="security.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     const SUPABASE_URL = ELTALLER_SUPABASE.url;
     const SUPABASE_ANON_KEY = ELTALLER_SUPABASE.anonKey;
@@ -22,8 +23,79 @@
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     window.db = db;
 
-    // Ocultar UI hasta confirmar sesión admin (evita flash de datos sensibles)
-    document.documentElement.style.visibility = 'hidden';
+    // SweetAlert2 — estética unificada del panel
+    const SWAL_OK = '#3D5239';
+    const SWAL_CANCEL = '#d33';
+
+    window.swalSuccess = function(text, title = '¡Éxito!') {
+      return Swal.fire({
+        icon: 'success',
+        title,
+        text,
+        confirmButtonColor: SWAL_OK,
+        timer: 2000,
+        showConfirmButton: false
+      });
+    };
+
+    window.swalError = function(text, title = 'Error') {
+      return Swal.fire({
+        icon: 'error',
+        title,
+        text,
+        confirmButtonColor: SWAL_OK
+      });
+    };
+
+    window.swalInfo = function(text, title = 'Atención') {
+      return Swal.fire({
+        icon: 'info',
+        title,
+        text,
+        confirmButtonColor: SWAL_OK
+      });
+    };
+
+    window.swalConfirm = async function({
+      title = '¿Estás seguro?',
+      text = 'Esta acción no se puede deshacer.',
+      confirmButtonText = 'Sí, confirmar',
+      cancelButtonText = 'Cancelar'
+    } = {}) {
+      const result = await Swal.fire({
+        title,
+        text,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: SWAL_OK,
+        cancelButtonColor: SWAL_CANCEL,
+        confirmButtonText,
+        cancelButtonText
+      });
+      return result.isConfirmed;
+    };
+
+    // Resolver sección ANTES del primer paint (evita flash Pedidos → otra sección)
+    (function bootAdminSeccion() {
+      const validas = ['dashboard', 'pedidos', 'productos', 'stock', 'portada', 'cupones', 'mensajes'];
+      let sec = (location.hash || '').replace(/^#/, '');
+      if (!validas.includes(sec)) {
+        try { sec = sessionStorage.getItem('eltaller_admin_seccion') || ''; } catch (_) { sec = ''; }
+      }
+      if (!validas.includes(sec)) sec = 'pedidos';
+      document.documentElement.dataset.adminSec = sec;
+      document.documentElement.classList.add('admin-booting');
+    })();
+
+    window.__adminAuthOk = false;
+    window.__adminUiReady = false;
+
+    function mostrarAdminSiListo() {
+      if (!window.__adminAuthOk || !window.__adminUiReady) return;
+      document.documentElement.classList.remove('admin-booting');
+      document.documentElement.classList.add('admin-ready');
+      document.documentElement.style.visibility = '';
+    }
 
     async function protegerPanelAdmin() {
       const { data: { session } } = await db.auth.getSession();
@@ -33,17 +105,19 @@
           : session.user.email.toLowerCase() === CORREO_ADMIN.toLowerCase());
 
       if (!session || !emailOk) {
-        alert('Acceso no autorizado.');
+        await swalError('Acceso no autorizado.');
         window.location.replace('login.html');
         return;
       }
 
-      document.documentElement.style.visibility = 'visible';
+      window.__adminAuthOk = true;
+      mostrarAdminSiListo();
     }
 
     protegerPanelAdmin();
 
     db.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') return;
       const emailOk = session?.user?.email &&
         (typeof esEmailAdmin === 'function'
           ? esEmailAdmin(session.user.email)
@@ -67,6 +141,44 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="motion.js"></script>
   <style>
+    /* Oculto hasta auth + restauración de sección */
+    html.admin-booting {
+      visibility: hidden;
+    }
+    html.admin-ready {
+      visibility: visible;
+    }
+
+    /* Durante el boot: mostrar SOLO la sección guardada (sin animación) */
+    html.admin-booting .seccion {
+      display: none !important;
+    }
+    html.admin-booting[data-admin-sec="dashboard"] #sec-dashboard,
+    html.admin-booting[data-admin-sec="productos"] #sec-productos,
+    html.admin-booting[data-admin-sec="stock"] #sec-stock,
+    html.admin-booting[data-admin-sec="portada"] #sec-portada,
+    html.admin-booting[data-admin-sec="cupones"] #sec-cupones,
+    html.admin-booting[data-admin-sec="mensajes"] #sec-mensajes {
+      display: block !important;
+    }
+    html.admin-booting[data-admin-sec="pedidos"] #sec-pedidos {
+      display: flex !important;
+    }
+    html.admin-booting .nav-item.active {
+      background-color: transparent;
+      color: #d1d5db;
+    }
+    html.admin-booting[data-admin-sec="dashboard"] .nav-item[data-seccion="dashboard"],
+    html.admin-booting[data-admin-sec="pedidos"] .nav-item[data-seccion="pedidos"],
+    html.admin-booting[data-admin-sec="productos"] .nav-item[data-seccion="productos"],
+    html.admin-booting[data-admin-sec="stock"] .nav-item[data-seccion="stock"],
+    html.admin-booting[data-admin-sec="portada"] .nav-item[data-seccion="portada"],
+    html.admin-booting[data-admin-sec="cupones"] .nav-item[data-seccion="cupones"],
+    html.admin-booting[data-admin-sec="mensajes"] .nav-item[data-seccion="mensajes"] {
+      background-color: #3C4C33;
+      color: #ffffff;
+    }
+
     /* Estilo para el indicador lateral en la pestaña activa */
     .nav-item.active {
       background-color: #3C4C33;
@@ -101,36 +213,42 @@
     <div>
       <!-- LOGO Y TÍTULO -->
       <div class="flex items-center gap-3 px-2 py-4 border-b border-taller-dark mb-6">
-        <img src="eltaller.png" alt="El Taller Distribuidora" class="w-14 h-14 object-contain shrink-0">
-        <div>
-          <h1 class="font-bold text-sm tracking-wider text-white">EL TALLER</h1>
-          <p class="text-[10px] text-gray-400 font-medium">Panel de Control</p>
+        <div class="w-16 h-16 rounded-full bg-white p-1.5 shadow-md ring-1 ring-white/25 shrink-0 flex items-center justify-center overflow-hidden">
+          <img src="eltaller.png" alt="El Taller Distribuidora" class="w-full h-full object-contain scale-110">
+        </div>
+        <div class="min-w-0">
+          <h1 class="font-bold text-sm tracking-wider text-white leading-tight">EL TALLER</h1>
+          <p class="text-[10px] text-gray-400 font-medium mt-0.5">Panel de Control</p>
         </div>
       </div>
 
       <!-- NAVEGACIÓN -->
       <nav class="space-y-1.5 text-xs font-semibold">
-        <button onclick="cambiarSeccion('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+        <button data-seccion="dashboard" onclick="cambiarSeccion('dashboard', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
           <i class="fa-solid fa-chart-line w-4 text-taller-accent"></i> Dashboard
         </button>
 
-        <button onclick="cambiarSeccion('pedidos', this)" class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+        <button data-seccion="pedidos" onclick="cambiarSeccion('pedidos', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
           <i class="fa-solid fa-list-check w-4 text-taller-accent"></i> Pedidos
         </button>
 
-        <button onclick="cambiarSeccion('productos', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+        <button data-seccion="productos" onclick="cambiarSeccion('productos', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
           <i class="fa-solid fa-box w-4 text-taller-accent"></i> Productos
         </button>
 
-        <button onclick="cambiarSeccion('portada', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+        <button data-seccion="stock" onclick="cambiarSeccion('stock', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+          <i class="fa-solid fa-boxes-stacked w-4 text-taller-accent"></i> Stock / Fábrica
+        </button>
+
+        <button data-seccion="portada" onclick="cambiarSeccion('portada', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
           <i class="fa-solid fa-bullhorn w-4 text-taller-accent"></i> Gestión de Portada
         </button>
 
-        <button onclick="cambiarSeccion('cupones', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+        <button data-seccion="cupones" onclick="cambiarSeccion('cupones', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
           <i class="fa-solid fa-ticket w-4 text-taller-accent"></i> Cupones
         </button>
 
-        <button onclick="cambiarSeccion('mensajes', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
+        <button data-seccion="mensajes" onclick="cambiarSeccion('mensajes', this)" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-gray-300 hover:bg-taller-dark hover:text-white">
           <i class="fa-solid fa-envelope w-4 text-taller-accent"></i> Mensajes
         </button>
       </nav>
@@ -249,8 +367,8 @@
       </div>
     </section>
 
-    <!-- SECCIÓN 2: PEDIDOS (Visible por defecto) -->
-    <section id="sec-pedidos" class="seccion flex flex-col h-full min-h-[calc(100vh-4rem)]">
+    <!-- SECCIÓN 2: PEDIDOS -->
+    <section id="sec-pedidos" class="seccion hidden flex flex-col h-full min-h-[calc(100vh-4rem)]">
       <!-- SECCIÓN DE PEDIDOS -->
       <div class="w-full flex flex-col flex-1 min-h-0 font-sans">
         <!-- Encabezado superior -->
@@ -285,7 +403,7 @@
           <div class="px-6 pt-3 pb-3 bg-gray-50/30 border-b border-gray-200 overflow-x-auto shrink-0">
             <div class="flex gap-2 text-xs font-semibold whitespace-nowrap" id="pestanas-estados">
               <button onclick="filtrarEstado('Todos')" class="tab-estado flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-300 shadow-sm text-gray-900 font-bold" data-estado="Todos">
-                Todos <span id="count-todos" class="bg-black text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
+                Todos <span id="count-todos" class="bg-[#4A5D3F] text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
               </button>
               <button onclick="filtrarEstado('Pendiente')" class="tab-estado flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:bg-white transition" data-estado="Pendiente">
                 Pendientes ⏳ <span id="count-pendiente" class="bg-gray-200 text-gray-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold">0</span>
@@ -365,10 +483,15 @@
             <label for="prod-exclusivo" class="text-xs font-semibold text-gray-700">Producto exclusivo</label>
           </div>
 
+          <div class="flex items-center gap-2 pt-6">
+            <input type="checkbox" id="prod-envio-gratis" checked class="w-4 h-4 accent-slate-800 rounded border-gray-300">
+            <label for="prod-envio-gratis" class="text-xs font-semibold text-gray-700">Envío gratis (badge en card)</label>
+          </div>
+
           <div class="md:col-span-2">
             <label class="block text-xs font-semibold text-gray-600 mb-1">Imagen</label>
             <input type="file" id="prod-img" accept="image/*"
-              class="w-full border rounded p-2 text-sm bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-slate-900 file:text-white file:text-xs file:font-bold file:cursor-pointer"
+              class="w-full border rounded p-2 text-sm bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-[#4A5D3F] file:text-white file:text-xs file:font-bold file:cursor-pointer"
               onchange="previsualizarImagen(this)">
             <p id="prod-img-nombre" class="text-xs text-gray-500 mt-1.5">Ningún archivo seleccionado</p>
             <div id="prod-img-preview" class="mt-2 hidden">
@@ -377,7 +500,7 @@
           </div>
 
           <div class="md:col-span-3">
-            <button type="submit" id="btn-guardar-prod" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-6 rounded-lg text-sm transition">
+            <button type="submit" id="btn-guardar-prod" class="bg-[#4A5D3F] hover:bg-[#3C4C33] text-white font-bold py-2 px-6 rounded-lg text-sm transition">
               ➕ Cargar Producto
             </button>
           </div>
@@ -398,11 +521,90 @@
                 <th class="p-3">Precio</th>
                 <th class="p-3">Stock</th>
                 <th class="p-3 text-center">Exclusivo</th>
+                <th class="p-3 text-center">Envío gratis</th>
                 <th class="p-3">Acciones</th>
               </tr>
             </thead>
             <tbody id="tabla-productos">
               <!-- Se llena dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN: CONTROL DE STOCK / FÁBRICA -->
+    <section id="sec-stock" class="seccion hidden space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Control de Stock</h2>
+          <p class="text-xs text-gray-500 font-medium mt-0.5">Inventario de fábrica — ajustá unidades y guardá los cambios.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="cargarStock()" class="bg-white border border-gray-200 text-gray-700 text-xs font-bold px-3 py-2 rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right"></i> Actualizar
+          </button>
+          <button type="button" id="btn-guardar-stock-todo" onclick="guardarTodosStock()" disabled
+            class="bg-[#4A5D3F] hover:bg-[#3C4C33] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+            <span id="badge-cambios-stock" class="hidden ml-0.5 bg-white/20 px-1.5 py-0.5 rounded text-[10px]">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Productos</p>
+          <p id="stock-stat-productos" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Unidades totales</p>
+          <p id="stock-stat-unidades" class="text-xl font-extrabold text-gray-900 mt-0.5">0</p>
+        </div>
+        <div class="bg-white rounded-xl border border-amber-200 shadow-sm px-4 py-3">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Stock bajo (≤3)</p>
+          <p id="stock-stat-bajo" class="text-xl font-extrabold text-amber-600 mt-0.5">0</p>
+        </div>
+        <div class="bg-white rounded-xl border border-red-200 shadow-sm px-4 py-3">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-red-500">Sin stock</p>
+          <p id="stock-stat-agotado" class="text-xl font-extrabold text-red-600 mt-0.5">0</p>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-4 border-b border-gray-100 flex flex-col md:flex-row gap-3">
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input type="text" id="stock-buscar" oninput="filtrarStock()"
+              placeholder="Buscar por nombre o categoría..."
+              class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold text-gray-800 focus:bg-white focus:border-[#4A5D3F] outline-none transition">
+          </div>
+          <select id="stock-filtro" onchange="filtrarStock()"
+            class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs font-semibold text-gray-700 outline-none focus:border-[#4A5D3F] cursor-pointer">
+            <option value="todos">Todos</option>
+            <option value="bajo">Stock bajo</option>
+            <option value="agotado">Sin stock</option>
+            <option value="ok">Con stock</option>
+            <option value="pendientes">Con cambios pendientes</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-gray-50 text-[10px] text-gray-500 font-extrabold uppercase tracking-wider border-b border-gray-100">
+                <th class="py-3 px-4 sm:px-5">Producto</th>
+                <th class="py-3 px-4 hidden sm:table-cell">Categoría</th>
+                <th class="py-3 px-4 hidden md:table-cell">Precio</th>
+                <th class="py-3 px-4">Estado</th>
+                <th class="py-3 px-4 text-center">Stock</th>
+                <th class="py-3 px-4 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-stock-body" class="text-sm divide-y divide-gray-100">
+              <!-- Se llena dinámicamente con JS -->
             </tbody>
           </table>
         </div>
@@ -544,7 +746,7 @@
           </div>
 
           <div class="flex items-end">
-            <button type="submit" id="btn-crear-cupon" class="et-press w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2">
+            <button type="submit" id="btn-crear-cupon" class="et-press w-full bg-[#4A5D3F] hover:bg-[#3C4C33] text-white font-bold py-2.5 px-4 rounded-lg text-sm flex items-center justify-center gap-2">
               <i class="fa-solid fa-plus"></i> Crear Cupón
             </button>
           </div>
@@ -637,7 +839,7 @@
       <button onclick="cerrarModalCustom()" class="px-4 py-2 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-100 transition">
         Cancelar
       </button>
-      <button id="modal-btn-confirmar" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition">
+      <button id="modal-btn-confirmar" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-[#4A5D3F] hover:bg-[#3C4C33] transition">
         Guardar
       </button>
     </div>
@@ -646,18 +848,56 @@
 </div>
 
   <script>
+    const SECCIONES_VALIDAS = ['dashboard', 'pedidos', 'productos', 'stock', 'portada', 'cupones', 'mensajes'];
+    const ADMIN_SECCION_KEY = 'eltaller_admin_seccion';
+
+    function seccionGuardada() {
+      const hash = (location.hash || '').replace(/^#/, '');
+      if (SECCIONES_VALIDAS.includes(hash)) return hash;
+      try {
+        const guardada = sessionStorage.getItem(ADMIN_SECCION_KEY);
+        if (SECCIONES_VALIDAS.includes(guardada)) return guardada;
+      } catch (_) {}
+      return 'pedidos';
+    }
+
+    function persistirSeccion(nombreSeccion) {
+      try { sessionStorage.setItem(ADMIN_SECCION_KEY, nombreSeccion); } catch (_) {}
+      document.documentElement.dataset.adminSec = nombreSeccion;
+      const hashActual = (location.hash || '').replace(/^#/, '');
+      if (hashActual === nombreSeccion) return;
+      // Evitar hashchange artificial: solo replaceState del hash
+      history.replaceState(null, '', `${location.pathname}${location.search}#${nombreSeccion}`);
+    }
+
     // Función para cambiar de pestaña en el Sidebar
-    function cambiarSeccion(nombreSeccion, elementoBoton) {
-      document.querySelectorAll('.seccion').forEach(sec => sec.classList.add('hidden'));
+    function cambiarSeccion(nombreSeccion, elementoBoton, opciones = {}) {
+      if (!SECCIONES_VALIDAS.includes(nombreSeccion)) {
+        nombreSeccion = 'pedidos';
+      }
+
+      const silencioso = opciones.silencioso === true;
+
+      document.querySelectorAll('.seccion').forEach(sec => {
+        sec.classList.add('hidden');
+        sec.classList.remove('et-section-enter');
+      });
       const destino = document.getElementById(`sec-${nombreSeccion}`);
       if (destino) {
         destino.classList.remove('hidden');
-        destino.classList.remove('et-section-enter');
-        void destino.offsetWidth;
-        destino.classList.add('et-section-enter');
+        if (!silencioso) {
+          void destino.offsetWidth;
+          destino.classList.add('et-section-enter');
+        }
       }
+
       document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-      elementoBoton.classList.add('active');
+      const botonActivo = elementoBoton || document.querySelector(`.nav-item[data-seccion="${nombreSeccion}"]`);
+      if (botonActivo) botonActivo.classList.add('active');
+
+      persistirSeccion(nombreSeccion);
+
+      if (silencioso) return;
 
       if (nombreSeccion === 'dashboard') {
         cargarMetricasDashboard();
@@ -665,6 +905,10 @@
 
       if (nombreSeccion === 'productos') {
         cargarCategoriasAdmin();
+      }
+
+      if (nombreSeccion === 'stock') {
+        cargarStock();
       }
 
       if (nombreSeccion === 'cupones') {
@@ -847,7 +1091,7 @@
       const { data: productos, error: errProd } = await db.from('productos').select('*');
 
       if (errP || !pedidos) {
-        alert('Error al obtener datos para el reporte.');
+        swalError('Error al obtener datos para el reporte.');
         return;
       }
 
@@ -925,7 +1169,7 @@
       const { data: pedidos, error } = await db.from('pedidos').select('*');
 
       if (error || !pedidos) {
-        alert('Error al obtener los pedidos.');
+        swalError('Error al obtener los pedidos.');
         return;
       }
 
@@ -934,7 +1178,7 @@
       const pedidosAPreparar = pedidos.filter(p => p.estado === 'Pendiente' || p.estado === 'En preparación');
 
       if (pedidosAPreparar.length === 0) {
-        alert('¡Excelente noticia! No hay pedidos pendientes para preparar en este momento.');
+        swalInfo('No hay pedidos pendientes para preparar en este momento.', '¡Excelente noticia!');
         return;
       }
 
@@ -1013,6 +1257,9 @@
           <td class="p-3 text-center">
             <input type="checkbox" ${p.exclusivo ? 'checked' : ''} onchange="actualizarExclusivo(${Number(p.id)}, this.checked)" class="w-4 h-4 accent-slate-800 cursor-pointer" title="Marcar como exclusivo">
           </td>
+          <td class="p-3 text-center">
+            <input type="checkbox" ${p.envio_gratis !== false ? 'checked' : ''} onchange="actualizarEnvioGratis(${Number(p.id)}, this.checked)" class="w-4 h-4 accent-slate-800 cursor-pointer" title="Mostrar badge Envío gratis">
+          </td>
           <td class="p-3">
             <button onclick="eliminarProducto(${Number(p.id)})" class="text-red-600 hover:text-red-800 font-bold text-xs bg-red-50 hover:bg-red-100 px-2 py-1 rounded">
               🗑️ Eliminar
@@ -1053,7 +1300,7 @@
 
       if (error) {
         console.error('Error al subir la imagen:', error.message);
-        alert('Hubo un error al subir la imagen.');
+        swalError('Hubo un error al subir la imagen.');
         return null;
       }
 
@@ -1138,20 +1385,23 @@
           precio: Number(document.getElementById('prod-precio').value),
           stock: Math.max(0, Math.floor(Number(document.getElementById('prod-stock').value) || 0)),
           exclusivo: document.getElementById('prod-exclusivo').checked,
+          envio_gratis: document.getElementById('prod-envio-gratis')
+            ? document.getElementById('prod-envio-gratis').checked
+            : true,
           img
         };
 
         if (!nuevo.titulo || !Number.isFinite(nuevo.precio) || nuevo.precio < 0) {
-          alert('Título y precio válidos son obligatorios.');
+          swalError('Título y precio válidos son obligatorios.', 'Datos incompletos');
           return;
         }
 
         const { error } = await db.from('productos').insert([nuevo]);
 
         if (error) {
-          alert('Error al guardar el producto: ' + error.message);
+          swalError('Error al guardar el producto: ' + error.message);
         } else {
-          alert('¡Producto creado con éxito!');
+          swalSuccess('Producto creado correctamente');
           document.getElementById('form-producto').reset();
           document.getElementById('prod-img-preview').classList.add('hidden');
           document.getElementById('prod-img-preview').querySelector('img').src = '';
@@ -1162,18 +1412,291 @@
         }
       } catch (err) {
         console.error(err);
-        alert(err.message || 'Error al procesar la imagen');
+        swalError(err.message || 'Error al procesar la imagen');
       } finally {
         btn.disabled = false;
         btn.textContent = '➕ Cargar Producto';
       }
     }
 
-    // Actualizar rápido stock
+    // Actualizar stock (tabla Productos o sección Stock / Fábrica)
     async function actualizarStock(id, nuevoStock) {
-      const stock = Math.max(0, Math.floor(Number(nuevoStock) || 0));
-      await db.from('productos').update({ stock }).eq('id', id);
-      console.log(`Stock del producto ${id} actualizado a ${stock}`);
+      let stock;
+      if (nuevoStock === undefined) {
+        const input = document.getElementById(`input-stock-${id}`);
+        stock = Math.max(0, Math.floor(parseInt(input?.value, 10) || 0));
+      } else {
+        stock = Math.max(0, Math.floor(Number(nuevoStock) || 0));
+      }
+
+      const { error } = await db.from('productos').update({ stock }).eq('id', id);
+
+      if (error) {
+        swalError('No se pudo actualizar el stock');
+        console.error(error);
+        return false;
+      }
+
+      if (nuevoStock === undefined) {
+        const prod = stockProductosCache.find(p => Number(p.id) === Number(id));
+        if (prod) prod.stock = stock;
+        stockCambiosPendientes.delete(Number(id));
+        actualizarBarraCambiosStock();
+        renderizarTablaStock();
+      }
+
+      swalSuccess('Stock actualizado correctamente');
+      return true;
+    }
+
+    // ——— Control de Stock (Fábrica) ———
+    let stockProductosCache = [];
+    const stockCambiosPendientes = new Map();
+
+    function estadoStock(n) {
+      const stock = Number(n) || 0;
+      if (stock <= 0) return { key: 'agotado', label: 'Sin stock', cls: 'bg-red-50 text-red-700 border-red-200' };
+      if (stock <= 3) return { key: 'bajo', label: 'Bajo', cls: 'bg-amber-50 text-amber-700 border-amber-200' };
+      return { key: 'ok', label: 'OK', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+    }
+
+    function imgStockFallback(el) {
+      el.onerror = null;
+      el.src = 'data:image/svg+xml,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+          <rect width="48" height="48" rx="8" fill="#F3F4F6"/>
+          <path d="M16 30l5-6 4 5 3-4 4 5H16z" fill="#D1D5DB"/>
+          <circle cx="20" cy="18" r="3" fill="#D1D5DB"/>
+        </svg>`
+      );
+    }
+
+    function actualizarStatsStock(lista) {
+      const productos = lista || stockProductosCache;
+      const unidades = productos.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
+      const bajo = productos.filter(p => {
+        const s = Number(p.stock) || 0;
+        return s > 0 && s <= 3;
+      }).length;
+      const agotado = productos.filter(p => (Number(p.stock) || 0) <= 0).length;
+
+      const elP = document.getElementById('stock-stat-productos');
+      const elU = document.getElementById('stock-stat-unidades');
+      const elB = document.getElementById('stock-stat-bajo');
+      const elA = document.getElementById('stock-stat-agotado');
+      if (elP) elP.textContent = productos.length;
+      if (elU) elU.textContent = unidades.toLocaleString('es-AR');
+      if (elB) elB.textContent = bajo;
+      if (elA) elA.textContent = agotado;
+    }
+
+    function actualizarBarraCambiosStock() {
+      const n = stockCambiosPendientes.size;
+      const btn = document.getElementById('btn-guardar-stock-todo');
+      const badge = document.getElementById('badge-cambios-stock');
+      if (btn) btn.disabled = n === 0;
+      if (badge) {
+        badge.textContent = String(n);
+        badge.classList.toggle('hidden', n === 0);
+      }
+    }
+
+    function marcarCambioStock(id, valor) {
+      const pid = Number(id);
+      const prod = stockProductosCache.find(p => Number(p.id) === pid);
+      if (!prod) return;
+
+      const stock = Math.max(0, Math.floor(Number(valor) || 0));
+      const input = document.getElementById(`input-stock-${pid}`);
+      if (input && Number(input.value) !== stock) input.value = stock;
+
+      if (stock === (Number(prod.stock) || 0)) {
+        stockCambiosPendientes.delete(pid);
+      } else {
+        stockCambiosPendientes.set(pid, stock);
+      }
+
+      const row = document.getElementById(`stock-row-${pid}`);
+      if (row) {
+        row.classList.toggle('bg-amber-50/60', stockCambiosPendientes.has(pid));
+        const badge = row.querySelector('[data-stock-estado]');
+        if (badge) {
+          const est = estadoStock(stock);
+          badge.className = `inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border ${est.cls}`;
+          badge.textContent = est.label;
+        }
+        const btn = row.querySelector('[data-guardar-fila]');
+        if (btn) {
+          btn.disabled = !stockCambiosPendientes.has(pid);
+          btn.classList.toggle('opacity-40', !stockCambiosPendientes.has(pid));
+        }
+      }
+
+      actualizarBarraCambiosStock();
+    }
+
+    function ajustarStockInput(id, delta) {
+      const input = document.getElementById(`input-stock-${id}`);
+      if (!input) return;
+      const actual = Math.max(0, Math.floor(parseInt(input.value, 10) || 0));
+      input.value = Math.max(0, actual + delta);
+      marcarCambioStock(id, input.value);
+    }
+
+    function productosStockFiltrados() {
+      const q = (document.getElementById('stock-buscar')?.value || '').trim().toLowerCase();
+      const filtro = document.getElementById('stock-filtro')?.value || 'todos';
+
+      return stockProductosCache.filter(p => {
+        const stockActual = stockCambiosPendientes.has(Number(p.id))
+          ? stockCambiosPendientes.get(Number(p.id))
+          : (Number(p.stock) || 0);
+        const est = estadoStock(stockActual);
+
+        if (filtro === 'bajo' && est.key !== 'bajo') return false;
+        if (filtro === 'agotado' && est.key !== 'agotado') return false;
+        if (filtro === 'ok' && est.key !== 'ok') return false;
+        if (filtro === 'pendientes' && !stockCambiosPendientes.has(Number(p.id))) return false;
+
+        if (!q) return true;
+        const haystack = `${p.titulo || ''} ${p.categoria || ''}`.toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+
+    function filtrarStock() {
+      renderizarTablaStock();
+    }
+
+    function renderizarTablaStock() {
+      const tbody = document.getElementById('tabla-stock-body');
+      if (!tbody) return;
+
+      const productos = productosStockFiltrados();
+      actualizarStatsStock(stockProductosCache);
+
+      if (productos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-10 text-center text-gray-400 text-sm">No hay productos para mostrar</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = productos.map(p => {
+        const id = Number(p.id);
+        const pendiente = stockCambiosPendientes.has(id);
+        const stockVal = pendiente ? stockCambiosPendientes.get(id) : (Number(p.stock) || 0);
+        const est = estadoStock(stockVal);
+        const img = escapeHtmlAdmin(safeUrlAdmin(p.img));
+
+        return `
+          <tr id="stock-row-${id}" class="hover:bg-gray-50/80 transition ${pendiente ? 'bg-amber-50/60' : ''}">
+            <td class="py-3 px-4 sm:px-5">
+              <div class="flex items-center gap-3 min-w-0">
+                <img src="${img}" alt="" onerror="imgStockFallback(this)"
+                  class="w-11 h-11 object-cover rounded-lg border border-gray-100 bg-gray-50 shrink-0">
+                <div class="min-w-0">
+                  <p class="font-bold text-gray-900 text-sm truncate">${escapeHtmlAdmin(p.titulo)}</p>
+                  <p class="text-[11px] text-gray-400 sm:hidden truncate">${escapeHtmlAdmin(p.categoria || '—')}</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-gray-500 text-xs font-medium hidden sm:table-cell">${escapeHtmlAdmin(p.categoria || '—')}</td>
+            <td class="py-3 px-4 font-bold text-gray-800 text-sm hidden md:table-cell">$${(Number(p.precio) || 0).toLocaleString('es-AR')}</td>
+            <td class="py-3 px-4">
+              <span data-stock-estado class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border ${est.cls}">${est.label}</span>
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center justify-center gap-1">
+                <button type="button" onclick="ajustarStockInput(${id}, -1)"
+                  class="w-8 h-8 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 transition flex items-center justify-center text-xs font-bold"
+                  aria-label="Restar unidad">
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+                <input type="number" id="input-stock-${id}" value="${stockVal}" min="0"
+                  oninput="marcarCambioStock(${id}, this.value)"
+                  class="w-16 text-center bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#4A5D3F]/40 focus:border-[#4A5D3F]">
+                <button type="button" onclick="ajustarStockInput(${id}, 1)"
+                  class="w-8 h-8 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 transition flex items-center justify-center text-xs font-bold"
+                  aria-label="Sumar unidad">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button type="button" data-guardar-fila onclick="actualizarStock(${id})" ${pendiente ? '' : 'disabled'}
+                class="inline-flex items-center gap-1.5 bg-[#4A5D3F] hover:bg-[#3C4C33] disabled:bg-gray-200 disabled:text-gray-400 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${pendiente ? '' : 'opacity-40 cursor-not-allowed'}">
+                <i class="fa-solid fa-check"></i> Guardar
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      actualizarBarraCambiosStock();
+    }
+
+    async function guardarTodosStock() {
+      if (stockCambiosPendientes.size === 0) return;
+
+      const btn = document.getElementById('btn-guardar-stock-todo');
+      if (btn) {
+        btn.disabled = true;
+        btn.dataset.label = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+      }
+
+      let ok = 0;
+      let fail = 0;
+      const pendientes = [...stockCambiosPendientes.entries()];
+
+      for (const [id, stock] of pendientes) {
+        const { error } = await db.from('productos').update({ stock }).eq('id', id);
+        if (error) {
+          fail++;
+          console.error(error);
+        } else {
+          const prod = stockProductosCache.find(p => Number(p.id) === Number(id));
+          if (prod) prod.stock = stock;
+          stockCambiosPendientes.delete(Number(id));
+          ok++;
+        }
+      }
+
+      if (btn && btn.dataset.label) btn.innerHTML = btn.dataset.label;
+      actualizarBarraCambiosStock();
+      renderizarTablaStock();
+
+      if (fail === 0) {
+        swalSuccess('Stock actualizado correctamente');
+      } else {
+        swalError(`Guardados: ${ok}. Errores: ${fail}`, 'Atención');
+      }
+    }
+
+    async function cargarStock() {
+      const tbody = document.getElementById('tabla-stock-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-gray-400 text-sm">Cargando inventario...</td></tr>';
+      stockCambiosPendientes.clear();
+      actualizarBarraCambiosStock();
+
+      const { data: productos, error } = await db.from('productos').select('*').order('titulo', { ascending: true });
+
+      if (error) {
+        tbody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-red-500 text-sm">Error al cargar productos</td></tr>';
+        console.error(error);
+        return;
+      }
+
+      stockProductosCache = productos || [];
+
+      if (stockProductosCache.length === 0) {
+        actualizarStatsStock([]);
+        tbody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-gray-400 text-sm">No hay productos registrados</td></tr>';
+        return;
+      }
+
+      renderizarTablaStock();
     }
 
     // Actualizar rápido precio
@@ -1187,19 +1710,37 @@
     async function actualizarExclusivo(id, esExclusivo) {
       const { error } = await db.from('productos').update({ exclusivo: !!esExclusivo }).eq('id', id);
       if (error) {
-        alert('Error al actualizar exclusivo: ' + error.message);
+        swalError('Error al actualizar exclusivo: ' + error.message);
         cargarProductosAdmin();
         return;
       }
       console.log(`Producto ${id} exclusivo: ${!!esExclusivo}`);
     }
 
+    async function actualizarEnvioGratis(id, valor) {
+      const { error } = await db.from('productos').update({ envio_gratis: !!valor }).eq('id', id);
+      if (error) {
+        swalError('Error al actualizar envío gratis: ' + error.message + '. ¿Ejecutaste el SQL supabase-add-envio-gratis.sql?');
+        cargarProductosAdmin();
+        return;
+      }
+    }
+
     // Eliminar producto
     async function eliminarProducto(id) {
-      if (confirm('¿Seguro que querés eliminar este producto?')) {
-        const { error } = await db.from('productos').delete().eq('id', id);
-        if (!error) cargarProductosAdmin();
+      const ok = await swalConfirm({
+        text: '¿Seguro que querés eliminar este producto? Esta acción no se puede deshacer.',
+        confirmButtonText: 'Sí, eliminar'
+      });
+      if (!ok) return;
+
+      const { error } = await db.from('productos').delete().eq('id', id);
+      if (error) {
+        swalError('Error al eliminar el producto: ' + error.message);
+        return;
       }
+      swalSuccess('Producto eliminado correctamente');
+      cargarProductosAdmin();
     }
 
     // 1. Cargar cupones mostrando el contador de usos
@@ -1263,9 +1804,8 @@
         msg.textContent = texto;
         msg.classList.remove('hidden');
       }
-      if (window.ElTallerMotion) {
-        window.ElTallerMotion.toast(texto, ok ? 'success' : 'error');
-      }
+      if (ok) swalSuccess(texto);
+      else swalError(texto);
     }
 
     // 2. Guardar cupón guardando el límite opcional
@@ -1337,19 +1877,21 @@
     // 3. Activar/Pausar cupón
     async function alternarEstadoCupon(id, nuevoEstado) {
       await db.from('cupones').update({ activo: nuevoEstado }).eq('id', id);
-      if (window.ElTallerMotion) {
-        window.ElTallerMotion.toast(nuevoEstado ? 'Cupón activado' : 'Cupón pausado', 'success');
-      }
+      swalSuccess(nuevoEstado ? 'Cupón activado' : 'Cupón pausado');
       cargarCuponesAdmin();
     }
 
     // 4. Eliminar cupón
     async function eliminarCupon(id) {
-      if (confirm('¿Estás seguro de eliminar este cupón?')) {
-        await db.from('cupones').delete().eq('id', id);
-        if (window.ElTallerMotion) window.ElTallerMotion.toast('Cupón eliminado', 'success');
-        cargarCuponesAdmin();
-      }
+      const ok = await swalConfirm({
+        text: '¿Estás seguro de eliminar este cupón? Esta acción no se puede deshacer.',
+        confirmButtonText: 'Sí, eliminar'
+      });
+      if (!ok) return;
+
+      await db.from('cupones').delete().eq('id', id);
+      swalSuccess('Cupón eliminado correctamente');
+      cargarCuponesAdmin();
     }
 
     async function cargarMensajesContacto() {
@@ -1431,8 +1973,14 @@
     }
 
     async function eliminarMensajeContacto(id) {
-      if (!confirm('¿Eliminar este mensaje?')) return;
+      const ok = await swalConfirm({
+        text: '¿Eliminar este mensaje? Esta acción no se puede deshacer.',
+        confirmButtonText: 'Sí, eliminar'
+      });
+      if (!ok) return;
+
       await db.from('mensajes_contacto').delete().eq('id', id);
+      swalSuccess('Mensaje eliminado correctamente');
       cargarMensajesContacto();
     }
 
@@ -1467,11 +2015,7 @@
         .eq('id', 1);
 
       if (!error) {
-        if (window.ElTallerMotion) {
-          window.ElTallerMotion.toast('Aviso de portada actualizado', 'success');
-        } else {
-          alert('¡Aviso de portada actualizado correctamente!');
-        }
+        swalSuccess('Aviso de portada actualizado correctamente');
         const form = document.getElementById('form-portada');
         if (form) {
           form.classList.remove('et-form-success');
@@ -1480,11 +2024,7 @@
         }
         cargarPortadaAdmin();
       } else {
-        if (window.ElTallerMotion) {
-          window.ElTallerMotion.toast('Error al guardar: ' + error.message, 'error');
-        } else {
-          alert('Error al guardar los cambios: ' + error.message);
-        }
+        swalError('Error al guardar los cambios: ' + error.message);
       }
     }
 
@@ -1579,7 +2119,7 @@
 
       if (error) {
         console.error(`Error actualizando ${campo}:`, error);
-        alert('No se pudo actualizar el estado del producto.');
+        swalError('No se pudo actualizar el estado del producto.');
         cargarGestionPortada();
       }
     }
@@ -1818,7 +2358,7 @@
           ${botonesExtra.join('')}
           <div class="relative" data-menu-pedido="${id}">
             <button type="button" id="btn-menu-pedido-${id}" onclick="event.stopPropagation(); toggleMenuPedido(${id})"
-              class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+              class="px-3 py-2 bg-[#4A5D3F] hover:bg-[#3C4C33] text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
               Acciones <i class="fa-solid fa-chevron-down text-[9px]"></i>
             </button>
             <div id="menu-pedido-${id}" class="hidden fixed z-[60] w-56 bg-white border border-gray-200 rounded-xl shadow-lg py-1 overflow-hidden">
@@ -1890,7 +2430,7 @@
     window.marcarPedidoComoEnviado = function(idPedido) {
       const pedido = pedidosLocales.find(p => p.id === idPedido);
       if (!pedido) {
-        alert('No se encontró el pedido.');
+        swalError('No se encontró el pedido.');
         return;
       }
 
@@ -1927,10 +2467,11 @@
             .eq('id', idPedido);
 
           if (error) {
-            alert('Error al guardar el código: ' + error.message);
+            swalError('Error al guardar el código: ' + error.message);
             return;
           }
           await cargarPedidosAdmin();
+          swalSuccess('Código de seguimiento actualizado');
         }
       });
     };
@@ -1939,21 +2480,29 @@
       const pedido = pedidosLocales.find(p => p.id === idPedido);
       if (!pedido) return;
       if (!pedido.cliente_telefono) {
-        if (window.ElTallerMotion) window.ElTallerMotion.toast('Este pedido no tiene teléfono.', 'error');
-        else alert('Este pedido no tiene teléfono.');
+        swalError('Este pedido no tiene teléfono.');
         return;
       }
-      if (window.ElTallerMotion) window.ElTallerMotion.toast('Abriendo WhatsApp…', 'success');
+      swalSuccess('Abriendo WhatsApp…');
       notificarCliente(pedido, 'Enviado');
     };
 
     window.cancelarPedido = async function(idPedido) {
-      if (!confirm(`¿Cancelar el pedido #${idPedido}?`)) return;
-      await cambiarEstadoPedido(idPedido, 'Cancelado');
+      const ok = await swalConfirm({
+        text: `¿Cancelar el pedido #${idPedido}?`,
+        confirmButtonText: 'Sí, cancelar'
+      });
+      if (!ok) return;
+      const actualizado = await cambiarEstadoPedido(idPedido, 'Cancelado');
+      if (actualizado) swalSuccess(`Pedido #${idPedido} cancelado`);
     };
 
     window.eliminarPedido = async function(idPedido) {
-      if (!confirm(`¿Eliminar definitivamente el pedido #${idPedido}? Esta acción no se puede deshacer.`)) return;
+      const ok = await swalConfirm({
+        text: `¿Eliminar definitivamente el pedido #${idPedido}? Esta acción no se puede deshacer.`,
+        confirmButtonText: 'Sí, eliminar'
+      });
+      if (!ok) return;
 
       const { error } = await db
         .from('pedidos')
@@ -1961,11 +2510,12 @@
         .eq('id', idPedido);
 
       if (error) {
-        alert('Error al eliminar el pedido: ' + error.message);
+        swalError('Error al eliminar el pedido: ' + error.message);
         return;
       }
 
       await cargarPedidosAdmin();
+      swalSuccess(`El pedido #${idPedido} fue eliminado.`);
     };
 
     // 5. Cambiar estado en Supabase
@@ -1983,16 +2533,16 @@
         .eq('id', idPedido);
 
       if (error) {
-        alert('Error al actualizar estado: ' + error.message);
-        return;
+        swalError('Error al actualizar estado: ' + error.message);
+        return false;
       }
 
       await cargarPedidosAdmin();
 
       if (nuevoEstado === 'Enviado' && pedido) {
         if (!pedido.cliente_telefono) {
-          alert('Pedido marcado como enviado, pero no tiene teléfono para notificar por WhatsApp.');
-          return;
+          swalInfo('Pedido marcado como enviado, pero no tiene teléfono para notificar por WhatsApp.');
+          return true;
         }
         const pedidoActualizado = {
           ...pedido,
@@ -2001,6 +2551,7 @@
         };
         notificarCliente(pedidoActualizado, 'Enviado');
       }
+      return true;
     };
 
     function imprimirEtiqueta(id) {
@@ -2018,7 +2569,7 @@
       const numLimpio = normalizarTelefonoWhatsApp(telefono);
 
       if (!numLimpio) {
-        alert('No se pudo armar el número de WhatsApp del cliente.');
+        swalError('No se pudo armar el número de WhatsApp del cliente.');
         return;
       }
 
@@ -2137,10 +2688,25 @@
 
     // Inicializar
     function initAdmin() {
+      // Restaurar sección sin animación, antes de mostrar la UI
+      const seccion = document.documentElement.dataset.adminSec || seccionGuardada();
+      cambiarSeccion(seccion, null, { silencioso: true });
+
       cargarProductosAdmin();
       cargarPedidosAdmin();
-      cargarMetricasDashboard();
       cargarCategoriasAdmin();
+
+      if (seccion === 'dashboard') cargarMetricasDashboard();
+      if (seccion === 'stock') cargarStock();
+      if (seccion === 'cupones') cargarCuponesAdmin();
+      if (seccion === 'mensajes') cargarMensajesContacto();
+      if (seccion === 'portada') {
+        cargarPortadaAdmin();
+        cargarGestionPortada();
+      }
+
+      window.__adminUiReady = true;
+      if (typeof mostrarAdminSiListo === 'function') mostrarAdminSiListo();
     }
 
     if (document.readyState === 'loading') {

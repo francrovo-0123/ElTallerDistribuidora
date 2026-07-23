@@ -211,25 +211,68 @@
     el.addEventListener('animationend', () => el.classList.remove('et-state-flash'), { once: true });
   }
 
-  function pulseClick(el) {
+  function pulseClick(el, event) {
     if (!el) return;
-    el.classList.remove('is-clicked');
+    el.classList.remove('is-clicked', 'is-ring');
     void el.offsetWidth;
     el.classList.add('is-clicked');
-    el.addEventListener('animationend', () => el.classList.remove('is-clicked'), { once: true });
+    if (!reduced && (el.classList.contains('et-btn') || el.classList.contains('et-btn-soft'))) {
+      el.classList.add('is-ring');
+    }
+    spawnRipple(el, event);
+    const clear = () => {
+      el.classList.remove('is-clicked', 'is-ring');
+    };
+    el.addEventListener('animationend', clear, { once: true });
+    setTimeout(clear, 420);
+  }
+
+  function spawnRipple(el, event) {
+    if (!el || reduced) return;
+    if (!el.classList.contains('et-btn') && !el.classList.contains('et-btn-icon') && !el.classList.contains('et-btn-soft') && !el.classList.contains('et-action-btn')) {
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    let x = rect.width / 2;
+    let y = rect.height / 2;
+    if (event && typeof event.clientX === 'number') {
+      x = event.clientX - rect.left;
+      y = event.clientY - rect.top;
+    }
+    const ripple = document.createElement('span');
+    ripple.className = 'et-ripple';
+    ripple.style.setProperty('--et-rx', `${x}px`);
+    ripple.style.setProperty('--et-ry', `${y}px`);
+    el.appendChild(ripple);
+    const remove = () => ripple.remove();
+    ripple.addEventListener('animationend', remove, { once: true });
+    setTimeout(remove, 600);
   }
 
   function crossfadeImage(img, newSrc) {
     if (!img || !newSrc) return;
-    if (img.getAttribute('src') === newSrc) return;
+    if (img.getAttribute('src') === newSrc) {
+      img.classList.add('is-loaded');
+      return;
+    }
     if (reduced) {
       img.src = newSrc;
+      img.classList.add('is-loaded');
       return;
     }
     img.classList.add('is-fading');
+    img.classList.remove('is-loaded');
     const swap = () => {
       img.src = newSrc;
-      raf(() => img.classList.remove('is-fading'));
+      const reveal = () => {
+        img.classList.add('is-loaded');
+        raf(() => img.classList.remove('is-fading'));
+      };
+      if (img.complete) reveal();
+      else {
+        img.addEventListener('load', reveal, { once: true });
+        img.addEventListener('error', reveal, { once: true });
+      }
     };
     const onEnd = (e) => {
       if (e.propertyName !== 'opacity') return;
@@ -284,11 +327,239 @@
   }
 
   function bindActionButtons(root) {
-    (root || document).querySelectorAll('.et-action-btn').forEach((btn) => {
+    (root || document).querySelectorAll('.et-action-btn, .et-btn, .et-btn-icon, .et-btn-soft').forEach((btn) => {
       if (btn.dataset.etActionBound === '1') return;
       btn.dataset.etActionBound = '1';
-      btn.addEventListener('click', () => pulseClick(btn));
+      btn.addEventListener('click', (e) => pulseClick(btn, e));
     });
+  }
+
+  const PRIMARY_BG_RE =
+    /(?:^|\s)(?:bg-taller|bg-black|bg-slate-900|bg-red-600|bg-\[#3D5239\]|bg-\[#4A5D3F\]|bg-\[#25D366\]|bg-\[#1B4332\]|bg-\[#1ebe57\])(?:\s|$)/;
+  const OUTLINE_RE = /(?:^|\s)border(?:\s|$|[-[])/;
+  const ICON_SIZE_RE = /(?:^|\s)(?:w-6|w-8|w-9|w-11|w-12|w-14|h-6|h-8|h-9|h-11|h-12|h-14)(?:\s|$)/;
+
+  function classifyControl(el) {
+    if (!el || el.dataset.etEnhanced === '1') return null;
+    if (el.classList.contains('banner-dot')) return null;
+    if (el.closest('input, textarea, select, [contenteditable="true"]')) return null;
+
+    const cls = el.className || '';
+    if (typeof cls !== 'string') return null;
+
+    // Already typed
+    if (el.classList.contains('et-btn') || el.classList.contains('et-btn-icon') || el.classList.contains('et-btn-soft')) {
+      return 'keep';
+    }
+
+    // Banner: tap frames only (no et-btn-icon — overflow/position)
+    if (el.classList.contains('banner-btn')) return 'banner';
+
+    if (el.classList.contains('et-product-card__btn')) return 'primary';
+    if (el.classList.contains('carrusel-nav')) return 'icon';
+
+    const isRound = /\brounded-full\b/.test(cls);
+    const isCompactIcon =
+      (ICON_SIZE_RE.test(cls) && (isRound || /\brounded-lg\b/.test(cls) || /\brounded\b/.test(cls)) && el.tagName === 'BUTTON') ||
+      (isRound && ICON_SIZE_RE.test(cls));
+
+    if (isCompactIcon) return 'icon';
+    if (PRIMARY_BG_RE.test(cls) || /\bbg-taller\b/.test(cls)) return 'primary';
+    if (OUTLINE_RE.test(cls) && (el.tagName === 'BUTTON' || el.tagName === 'A')) return 'soft';
+    if (el.tagName === 'BUTTON' || el.getAttribute('role') === 'button') return 'press';
+    return null;
+  }
+
+  function playEnterFrames(el, index) {
+    if (!el || reduced || el.dataset.etEnterPlayed === '1') return;
+    if (!el.classList.contains('et-btn') && !el.classList.contains('et-btn-icon') && !el.classList.contains('et-btn-soft')) {
+      return;
+    }
+    el.dataset.etEnterPlayed = '1';
+    el.classList.add('et-btn-enter');
+    el.style.animationDelay = `${Math.min(index, 10) * 35}ms`;
+    const clear = () => {
+      el.classList.remove('et-btn-enter');
+      el.style.animationDelay = '';
+    };
+    el.addEventListener('animationend', clear, { once: true });
+    setTimeout(clear, 700);
+  }
+
+  function enhanceButtons(root) {
+    const scope = root || document;
+    const nodes = scope.querySelectorAll(
+      'button, [role="button"], a.et-btn, a.et-press, a.et-btn-icon, a.et-btn-soft, .banner-btn, a[class*="bg-taller"], a[class*="bg-[#3D5239]"], a[class*="bg-[#4A5D3F]"], a[class*="bg-black"], a[class*="bg-[#25D366]"], a[class*="bg-[#1B4332]"]'
+    );
+
+    let enterIndex = 0;
+    nodes.forEach((el) => {
+      if (el.dataset.etEnhanced === '1') {
+        if (el.classList.contains('et-btn') || el.classList.contains('et-btn-icon') || el.classList.contains('et-btn-soft') || el.classList.contains('et-action-btn')) {
+          if (el.dataset.etActionBound !== '1') {
+            el.dataset.etActionBound = '1';
+            el.addEventListener('click', (e) => pulseClick(el, e));
+          }
+        }
+        return;
+      }
+
+      const kind = classifyControl(el);
+      if (!kind) return;
+
+      el.dataset.etEnhanced = '1';
+      el.classList.add('et-press');
+
+      if (kind === 'primary') {
+        el.classList.add('et-btn');
+      } else if (kind === 'icon') {
+        el.classList.add('et-btn-icon');
+      } else if (kind === 'soft') {
+        el.classList.add('et-btn-soft');
+      } else if (kind === 'banner') {
+        if (el.dataset.etActionBound !== '1') {
+          el.dataset.etActionBound = '1';
+          el.addEventListener('click', (e) => pulseClick(el, e));
+        }
+        return;
+      }
+
+      if (el.classList.contains('et-btn') || el.classList.contains('et-btn-icon') || el.classList.contains('et-btn-soft') || el.classList.contains('et-action-btn')) {
+        if (el.dataset.etActionBound !== '1') {
+          el.dataset.etActionBound = '1';
+          el.addEventListener('click', (e) => pulseClick(el, e));
+        }
+        playEnterFrames(el, enterIndex++);
+      }
+    });
+
+    bindActionButtons(scope);
+    bindImageFades(scope);
+  }
+
+  function bindImageFades(root) {
+    const scope = root || document;
+    const imgs = scope.querySelectorAll
+      ? scope.querySelectorAll('img.et-img-fade')
+      : scope.classList && scope.classList.contains('et-img-fade')
+        ? [scope]
+        : [];
+    imgs.forEach((img) => {
+      const mark = () => img.classList.add('is-loaded');
+      if (img.complete && img.naturalWidth > 0) {
+        mark();
+        return;
+      }
+      if (img.dataset.etFadeBound === '1') return;
+      img.dataset.etFadeBound = '1';
+      img.addEventListener('load', mark, { once: true });
+      img.addEventListener('error', mark, { once: true });
+    });
+  }
+
+  /** Product-grid skeleton cards */
+  function renderProductSkeletons(count, opts) {
+    const n = Math.max(1, Math.min(Number(count) || 10, 20));
+    const variant = (opts && opts.variant) || 'grid';
+    const extra =
+      variant === 'destacado'
+        ? 'et-skel-card--destacado carrusel-card'
+        : variant === 'carrusel' || variant === 'oferta'
+          ? 'et-skel-card--carrusel carrusel-card'
+          : '';
+    let html = '';
+    for (let i = 0; i < n; i++) {
+      html += `
+        <div class="et-skel-card ${extra}" style="--et-stagger:${Math.min(i, 12)}" aria-hidden="true">
+          <span class="et-skel et-skel-card__media"></span>
+          <span class="et-skel et-skel-card__line"></span>
+          <span class="et-skel et-skel-card__line et-skel-card__line--sm"></span>
+          <span class="et-skel et-skel-card__btn"></span>
+        </div>`;
+    }
+    return html;
+  }
+
+  function renderPdpSkeleton() {
+    return `
+      <div class="et-skel-pdp" aria-hidden="true">
+        <span class="et-skel et-skel-pdp__media"></span>
+        <div>
+          <span class="et-skel et-skel-pdp__chip"></span>
+          <span class="et-skel et-skel-pdp__title block"></span>
+          <span class="et-skel et-skel-pdp__price block"></span>
+          <span class="et-skel et-skel-pdp__text block"></span>
+          <span class="et-skel et-skel-pdp__text block" style="width:92%"></span>
+          <span class="et-skel et-skel-pdp__text block" style="width:70%"></span>
+          <span class="et-skel et-skel-pdp__btn block"></span>
+        </div>
+      </div>`;
+  }
+
+  function renderCartSkeletons(count) {
+    const n = Math.max(1, Math.min(Number(count) || 3, 6));
+    let html = '';
+    for (let i = 0; i < n; i++) {
+      html += `
+        <div class="et-skel-row" style="--et-stagger:${i}" aria-hidden="true">
+          <span class="et-skel et-skel-row__thumb"></span>
+          <div class="et-skel-row__body">
+            <span class="et-skel et-skel-row__line block"></span>
+            <span class="et-skel et-skel-row__line et-skel-row__line--sm block"></span>
+          </div>
+        </div>`;
+    }
+    return html;
+  }
+
+  function showSkeletons(container, html) {
+    if (!container) return;
+    container.innerHTML = html;
+    container.setAttribute('aria-busy', 'true');
+  }
+
+  function clearBusy(container) {
+    if (container) container.removeAttribute('aria-busy');
+  }
+
+  /** Auto data-reveal on static content pages */
+  function autoMarkReveals() {
+    const main = document.querySelector('main');
+    if (!main || main.dataset.etRevealAuto === '1') return;
+    if (
+      document.getElementById('grid-productos') ||
+      document.getElementById('grilla-productos') ||
+      document.getElementById('detalle-producto-container') ||
+      document.body.classList.contains('admin-body') ||
+      document.getElementById('admin-app')
+    ) {
+      return;
+    }
+    const candidates = main.querySelectorAll(
+      ':scope > section, :scope > .max-w-3xl > div, :scope > .max-w-3xl > section, :scope > div.space-y-10 > div, :scope > .max-w-4xl > section, :scope > .max-w-2xl > *'
+    );
+    candidates.forEach((el, i) => {
+      if (el.hasAttribute('data-reveal')) return;
+      if (el.querySelector('[data-reveal]')) return;
+      el.setAttribute('data-reveal', '');
+      el.style.transitionDelay = `${Math.min(i, 8) * 55}ms`;
+    });
+    main.dataset.etRevealAuto = '1';
+  }
+
+  function observeButtonEnhancements() {
+    if (typeof MutationObserver === 'undefined' || document.body.dataset.etBtnObserver === '1') return;
+    document.body.dataset.etBtnObserver = '1';
+    let scheduled = false;
+    const observer = new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      raf(() => {
+        scheduled = false;
+        enhanceButtons(document);
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   function initPageEnter() {
@@ -329,13 +600,23 @@
     staggerChildren,
     flashState,
     pulseClick,
+    spawnRipple,
     crossfadeImage,
     bumpQty,
     flipReorder,
     captureRankTops,
     bindActionButtons,
+    enhanceButtons,
+    observeButtonEnhancements,
     initPageEnter,
     bindAuthModal,
+    bindImageFades,
+    renderProductSkeletons,
+    renderPdpSkeleton,
+    renderCartSkeletons,
+    showSkeletons,
+    clearBusy,
+    autoMarkReveals,
   };
 
   global.ElTallerMotion = api;
@@ -350,8 +631,12 @@
       api.enhanceCartDrawer();
       api.bindAuthModal();
       api.initPageEnter();
+      api.autoMarkReveals();
       api.initScrollReveal();
+      api.enhanceButtons();
       api.bindActionButtons();
+      api.bindImageFades();
+      api.observeButtonEnhancements();
     };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', boot);
